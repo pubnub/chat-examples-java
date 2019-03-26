@@ -2,12 +2,15 @@ package com.pubnub.crc.chat_snippets_java;
 
 import com.pubnub.api.PNConfiguration;
 
-public class TestHarness {
+class TestHarness {
 
-    protected PNConfiguration getPnConfiguration() {
+    static final String SUB_KEY = "demo-36";
+    static final String PUB_KEY = "demo-36";
+
+    PNConfiguration getPnConfiguration() {
         PNConfiguration pnConfiguration = new PNConfiguration();
-        pnConfiguration.setSubscribeKey("demo-36");
-        pnConfiguration.setPublishKey("demo-36");
+        pnConfiguration.setSubscribeKey(SUB_KEY);
+        pnConfiguration.setPublishKey(PUB_KEY);
         return pnConfiguration;
     }
 

@@ -23,4 +23,5 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.pubnub:pubnub-gson:4.22.0-beta'
     testImplementation 'junit:junit:4.12'
+    testImplementation 'org.awaitility:awaitility:3.1.5'
 }
