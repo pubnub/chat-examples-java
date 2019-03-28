@@ -38,8 +38,10 @@ public class ConnectToPubNubTest extends TestHarness {
 
     @Test
     public void testUuid() {
+        // tag::CON-1[]
         String uuid = UUID.randomUUID().toString();
         pubnub.getConfiguration().setUuid(uuid);
+        // end::CON-1[]
         assertEquals(uuid, pubnub.getConfiguration().getUuid());
     }
 
