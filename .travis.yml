@@ -1,19 +1,41 @@
 language: android
 android:
   components:
-  - tools
-  - platform-tools
-  - build-tools-28.0.3
-  - android-28
-  - extra-google-m2repository
-  - extra-android-m2repository
+    - tools
+    - platform-tools
+    - build-tools-28.0.3
+    - android-28
+    - extra-google-m2repository
+    - extra-android-m2repository
+
 jdk:
-- oraclejdk8
+  - oraclejdk8
+
+node_js:
+  - '10'
+
+cache: yarn
+
 matrix:
   include:
-  - env: NAME='Examples test' TASK='examples_full_test' SHOULD_BUILD_DOCS=0
-  - env: NAME='Snippets test' TASK='snippets_full_test' SHOULD_BUILD_DOCS=1
+    - env: NAME='Examples test' TASK='examples_full_test' SHOULD_BUILD_DOCS=0
+    - env: NAME='Snippets test' TASK='snippets_full_test' SHOULD_BUILD_DOCS=1
+
+install:
+  - yarn install chalk fancy-log simple-git
+  - yarn install pubnub
+  - yarn i
+
+before_script:
+  - git config --global user.name "${GH_NAME}"
+  - git config --global user.email "${GH_EMAIL}"
+  - echo "machine github.com login ${GH_NAME} password ${GH_TOKEN}"  > ~/.netrc
+
+script:
+  - gulp "${TASK}"
+
 before_install:
-- chmod +x gradlew
+  - chmod +x gradlew
+
 after_success:
-- ruby .travis.docs.rb
+  - node .travis.docs.js
