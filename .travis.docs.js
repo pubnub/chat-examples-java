@@ -43,7 +43,6 @@ let retryCounter = 1;
  *
  * @param {String} message - Message which explain what has been
  * performed before error has been created.
- * performed before error has been created.
  * @param {Error} error - Object which hold information about recent
  * error.
  */
