@@ -93,7 +93,7 @@ public class ConnectToPubNubTest extends TestHarness {
     @Test
     public void testPublish() throws PubNubException {
         JsonObject message = new JsonObject();
-        message.addProperty("text", UUID.randomUUID().toString().substring(0, 5));
+        message.addProperty("text", UUID.randomUUID().toString());
 
         PNPublishResult response = pubnub.publish()
                 .channel("my_channel")

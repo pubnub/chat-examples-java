@@ -1,22 +1,13 @@
-apply plugin: 'com.android.library'
+plugins {
+    id 'java-library'
+    id 'checkstyle'
+}
 
-android {
-    compileSdkVersion 28
 
-    defaultConfig {
-        minSdkVersion 16
-        targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
-
+def configDir = "${project.rootDir}/config/checkstyle"
+checkstyle {
+    toolVersion = "8.14"
+    configFile file("$configDir/checkstyle.xml")
 }
 
 dependencies {
