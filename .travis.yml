@@ -1,4 +1,5 @@
 language: android
+sudo: true
 android:
   components:
     - tools
@@ -11,20 +12,18 @@ android:
 jdk:
   - oraclejdk8
 
-node_js:
-  - '10'
-
-cache: yarn
-
 matrix:
   include:
     - env: NAME='Examples test' TASK='examples_full_test' SHOULD_BUILD_DOCS=0
     - env: NAME='Snippets test' TASK='snippets_full_test' SHOULD_BUILD_DOCS=1
 
+before_install:
+  - chmod +x gradlew
+
 install:
-  - yarn install chalk fancy-log simple-git
-  - yarn install pubnub
-  - yarn i
+  - sudo apt-get install nodejs npm
+  - npm config set strict-ssl false
+  - npm install chalk fancy-log simple-git
 
 before_script:
   - git config --global user.name "${GH_NAME}"
@@ -32,10 +31,7 @@ before_script:
   - echo "machine github.com login ${GH_NAME} password ${GH_TOKEN}"  > ~/.netrc
 
 script:
-  - gulp "${TASK}"
-
-before_install:
-  - chmod +x gradlew
+  - ./gradlew clean assembleDebug test lint
 
 after_success:
   - node .travis.docs.js
