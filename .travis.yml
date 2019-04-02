@@ -1,0 +1,49 @@
+language: android
+sudo: required
+
+addons:
+  apt:
+    packages:
+      - lynx
+
+jdk:
+  - oraclejdk8
+
+android:
+  components:
+    - tools
+    - platform-tools
+    - build-tools-28.0.3
+    - android-28
+    - extra-google-m2repository
+    - extra-android-m2repository
+
+matrix:
+  include:
+    - env: NAME='Examples test' TASK='examples_full_test' SHOULD_BUILD_DOCS=0
+    - env: NAME='Snippets test' TASK='snippets_full_test' SHOULD_BUILD_DOCS=1
+
+before_install:
+  - chmod +x gradlew
+  - curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
+  - sudo apt-get install nodejs
+  - sudo apt-get install build-essential
+
+install:
+  - npm config set strict-ssl false
+  - npm install chalk fancy-log simple-git   
+
+before_script:
+  - git config --global user.name "${GH_NAME}"
+  - git config --global user.email "${GH_EMAIL}"
+  - echo "machine github.com login ${GH_NAME} password ${GH_TOKEN}"  > ~/.netrc
+
+script:
+  - ./gradlew clean check
+
+after_success:
+  - node .travis.docs.js
+  
+after_failure:
+  - if [ -f /home/travis/build/pubnub/chat-examples-java/Examples/build/reports/lint-results.html]; then lynx -dump /home/travis/build/pubnub/chat-examples-java/Examples/build/reports/lint-results.html; fi
+
