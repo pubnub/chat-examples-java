@@ -5,17 +5,6 @@ const log = require('fancy-log');
 const chalk = require('chalk');
 const fs = require('fs');
 
-
-// Check whether docs should be skipped for this build or not.
-if (['1', 'true'].indexOf(process.env['SHOULD_BUILD_DOCS']) === -1
-    || process.env['TRAVIS_BRANCH'] !== 'master'
-    || process.env['TRAVIS_EVENT_TYPE'] !== 'push') {
-
-  // There is nothing related to docs.
-  return;
-}
-
-
 // Extract information related to repository name and sample language.
 const repositoryName = process.env['TRAVIS_REPO_SLUG'].split('/').pop();
 const language = repositoryName.split('-').pop();
@@ -34,10 +23,10 @@ let changeLog = null;
 // Samples location.
 const samplesPath = [currentRepositoryPath, 'Snippets'].join('/');
 
+
 // Update retry configuration.
 const updateRetryCount = 3;
 let retryCounter = 1;
-
 
 /**
  *
@@ -65,6 +54,7 @@ const logError = function (message, error) {
     process.exit(100);
   }
 };
+
 
 /**
  * Push updated submodule back to CRC repository.
