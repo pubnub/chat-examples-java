@@ -78,6 +78,7 @@ public class ConnectToPubNubTest extends TestHarness {
 
     @Test
     public void testUserMetadata() throws PubNubException {
+        // tag::CON-3[]
         JsonObject metadata = new JsonObject();
         metadata.addProperty("color", "red");
 
@@ -85,7 +86,7 @@ public class ConnectToPubNubTest extends TestHarness {
                 .channels(Collections.singletonList(UUID.randomUUID().toString()))
                 .state(metadata)
                 .sync();
-
+        // end::CON-3[]
         assertNotNull(response);
         assertEquals(metadata, response.getState().getAsJsonObject());
     }
