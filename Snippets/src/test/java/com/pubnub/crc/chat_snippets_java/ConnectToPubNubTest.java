@@ -1,6 +1,7 @@
 package com.pubnub.crc.chat_snippets_java;
 
 import com.google.gson.JsonObject;
+import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.PubNubException;
 import com.pubnub.api.models.consumer.PNPublishResult;
@@ -23,38 +24,47 @@ import static org.junit.Assert.assertTrue;
 
 public class ConnectToPubNubTest extends TestHarness {
 
-    private PubNub pubnub;
+    private PubNub pubNubClient;
 
     @Before
     public void beforeEach() {
-        pubnub = new PubNub(getPnConfiguration());
+        pubNubClient = new PubNub(getPnConfiguration());
     }
 
     @After
     public void afterEach() {
-        pubnub.forceDestroy();
-        pubnub = null;
+        pubNubClient.unsubscribeAll();
+        pubNubClient.forceDestroy();
+        pubNubClient = null;
     }
 
     @Test
     public void testUuid() {
         // tag::CON-1[]
         String uuid = UUID.randomUUID().toString();
-        pubnub.getConfiguration().setUuid(uuid);
+
+        PNConfiguration pnConfiguration = new PNConfiguration();
+        pnConfiguration.setSubscribeKey(SUB_KEY);
+        pnConfiguration.setPublishKey(PUB_KEY);
+        pnConfiguration.setUuid(uuid);
+
+        PubNub pubNub = new PubNub(pnConfiguration);
         // end::CON-1[]
-        assertEquals(uuid, pubnub.getConfiguration().getUuid());
+        assertNotNull(uuid);
+        assertNotNull(pubNub);
+        assertEquals(uuid, pubNub.getConfiguration().getUuid());
     }
 
     @Test
     public void testSubscribe() throws PubNubException, InterruptedException {
 
-        pubnub.subscribe()
+        pubNubClient.subscribe()
                 .channels(Collections.singletonList("my_channel"))
                 .execute();
 
         Thread.sleep(TimeUnit.SECONDS.toMillis(2));
 
-        PNHereNowResult response = pubnub.hereNow()
+        PNHereNowResult response = pubNubClient.hereNow()
                 .channels(Collections.singletonList("my_channel"))
                 .includeUUIDs(true)
                 .sync();
@@ -67,7 +77,7 @@ public class ConnectToPubNubTest extends TestHarness {
         assertNotNull(hereNowChannelData.getOccupants());
 
         for (PNHereNowOccupantData occupant : hereNowChannelData.getOccupants()) {
-            if (occupant.getUuid().contains(pubnub.getConfiguration().getUuid())) {
+            if (occupant.getUuid().contains(pubNubClient.getConfiguration().getUuid())) {
                 present = true;
                 break;
             }
@@ -78,14 +88,15 @@ public class ConnectToPubNubTest extends TestHarness {
 
     @Test
     public void testUserMetadata() throws PubNubException {
+        // tag::CON-3[]
         JsonObject metadata = new JsonObject();
         metadata.addProperty("color", "red");
 
-        PNSetStateResult response = pubnub.setPresenceState()
+        PNSetStateResult response = pubNubClient.setPresenceState()
                 .channels(Collections.singletonList(UUID.randomUUID().toString()))
                 .state(metadata)
                 .sync();
-
+        // end::CON-3[]
         assertNotNull(response);
         assertEquals(metadata, response.getState().getAsJsonObject());
     }
@@ -95,7 +106,7 @@ public class ConnectToPubNubTest extends TestHarness {
         JsonObject message = new JsonObject();
         message.addProperty("text", UUID.randomUUID().toString());
 
-        PNPublishResult response = pubnub.publish()
+        PNPublishResult response = pubNubClient.publish()
                 .channel("my_channel")
                 .message(message)
                 .sync();
