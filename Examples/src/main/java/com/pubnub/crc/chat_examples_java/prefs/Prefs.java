@@ -4,6 +4,9 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.pubnub.crc.chat_examples_java.model.Users;
+import com.pubnub.crc.chat_examples_java.util.Helper;
+
 public class Prefs {
 
     private static String TAG = "Prefs";
@@ -55,7 +58,11 @@ public class Prefs {
         prefs.edit().putString(KEY_SUB, subKey).commit();
     }
 
+    @SuppressLint("ApplySharedPref")
     public String uuid() {
+        if (!prefs.contains(KEY_UUID)) {
+            prefs.edit().putString(KEY_UUID, Helper.getRandomElement(Users.all()).getUuid()).commit();
+        }
         return prefs.getString(KEY_UUID, null);
     }
 

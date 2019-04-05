@@ -6,6 +6,7 @@ import android.content.Intent;
 import com.pubnub.crc.chat_examples_java.prefs.Prefs;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 public class App extends Application {
 
@@ -19,6 +20,8 @@ public class App extends Application {
         super.onCreate();
 
         sInstance = this;
+
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
 
         Prefs.initialize(this);
     }

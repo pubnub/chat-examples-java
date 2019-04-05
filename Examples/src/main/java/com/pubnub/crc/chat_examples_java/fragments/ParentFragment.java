@@ -1,5 +1,6 @@
 package com.pubnub.crc.chat_examples_java.fragments;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,11 +14,11 @@ import androidx.fragment.app.Fragment;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-abstract class SuperFragment extends Fragment {
+abstract class ParentFragment extends Fragment {
 
-    private static final String TAG = "SuperFragment";
+    private static final String TAG = "ParentFragment";
 
-    public Context fragmentContext;
+    Context fragmentContext;
     private Unbinder mUnbinder;
 
     public abstract int provideLayoutResourceId();
@@ -31,7 +32,7 @@ abstract class SuperFragment extends Fragment {
     public void extractArguments() {
     }
 
-    public ParentActivityImpl hostActivity;
+    ParentActivityImpl hostActivity;
 
     @Nullable
     @Override
@@ -74,6 +75,10 @@ abstract class SuperFragment extends Fragment {
     public void onDetach() {
         this.fragmentContext = null;
         super.onDetach();
+    }
+
+    void runOnUiThread(Runnable runnable) {
+        ((Activity) fragmentContext).runOnUiThread(runnable);
     }
 
 }

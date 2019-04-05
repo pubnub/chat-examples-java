@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="apple_red">#E11129</color>
+    <color name="monza">#AC0E20</color>
+    <color name="black">#000000</color>
+    <color name="cod_gray">#2D3136</color>
+    <color name="white">#FFF</color>
+    <color name="bright_gray">#595959</color>
+    <color name="pumice">#C6C6C6</color>
+    <color name="cinder">#26292D</color>
+</resources>
