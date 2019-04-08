@@ -14,6 +14,7 @@ import com.pubnub.crc.chat_examples_java.util.ParentActivityImpl;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
 import butterknife.BindView;
 
 public class MainActivity extends ParentActivity implements ParentActivityImpl {
@@ -30,6 +31,7 @@ public class MainActivity extends ParentActivity implements ParentActivityImpl {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setSupportActionBar(mToolbar);
         initializePubNub();
         addFragment(ChatFragment.newInstance("demo-animal-chat"));
     }
@@ -56,6 +58,11 @@ public class MainActivity extends ParentActivity implements ParentActivityImpl {
     @Override
     public void setTitle(String title) {
         mToolbar.setTitle(title);
+    }
+
+    @Override
+    public void addFragment(Fragment fragment) {
+        super.addFragment(fragment);
     }
 
     @Override

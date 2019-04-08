@@ -23,9 +23,16 @@ public abstract class ParentActivity extends AppCompatActivity {
     protected void addFragment(Fragment fragment) {
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction ft = manager.beginTransaction();
+        setupAnimations(ft);
         ft.replace(R.id.container, fragment);
         ft.addToBackStack(fragment.getClass().getSimpleName());
         ft.commit();
+    }
+
+    private void setupAnimations(FragmentTransaction ft) {
+        /*ft.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim
+                .exit_to_right);*/
+        ft.setCustomAnimations(R.anim.fade_in, R.anim.fade_out, R.anim.fade_in, R.anim.fade_out);
     }
 
 }

@@ -2,6 +2,9 @@ package com.pubnub.crc.chat_examples_java.fragments;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.PNCallback;
@@ -15,6 +18,7 @@ import com.pubnub.crc.chat_examples_java.adapters.ChatAdapter;
 import com.pubnub.crc.chat_examples_java.prefs.Prefs;
 import com.pubnub.crc.chat_examples_java.pubnub.Message;
 import com.pubnub.crc.chat_examples_java.view.MessageComposer;
+import com.pubnub.crc.chat_examples_java.view.ProgressView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,11 +40,14 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
     @BindView(R.id.chat_swipe)
     SwipeRefreshLayout mSwipeRefreshLayout;
 
-    @BindView(R.id.chat_recyclerview)
+    @BindView(R.id.chat_recycler_view)
     RecyclerView mChatsRecyclerView;
 
     @BindView(R.id.chats_message_composer)
     MessageComposer mMessageComposer;
+
+    @BindView(R.id.chat_progress_view)
+    ProgressView mProgressView;
 
     ChatAdapter mChatAdapter;
     List<Message> mMessages = new ArrayList<>();
@@ -57,12 +64,20 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        addPubNubListener();
+    }
+
+    @Override
     public int provideLayoutResourceId() {
         return R.layout.fragment_chat;
     }
 
     @Override
     public void setViewBehaviour() {
+        setHasOptionsMenu(true);
+
         mSwipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorPrimary));
         mSwipeRefreshLayout.setEnabled(false);
 
@@ -81,6 +96,24 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
         mChatsRecyclerView.setAdapter(mChatAdapter);
 
         mMessageComposer.setListener(this);
+
+        subscribe();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_chat, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_chat_info:
+                hostActivity.addFragment(ChatInfoFragment.newInstance(mChannel));
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -95,16 +128,15 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
     }
 
     @Override
-    public void setupData(@Nullable Bundle savedInstanceState) {
-        addPubNubListener();
-        subscribe();
+    public void onReady() {
+
     }
 
     private void addPubNubListener() {
         mPubNubListener = new SubscribeCallback() {
             @Override
             public void status(PubNub pubnub, PNStatus status) {
-
+                mProgressView.setEnabled(false);
             }
 
             @Override

@@ -3,12 +3,14 @@ package com.pubnub.crc.chat_examples_java.fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.pubnub.crc.chat_examples_java.util.ParentActivityImpl;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import butterknife.ButterKnife;
@@ -16,7 +18,7 @@ import butterknife.Unbinder;
 
 abstract class ParentFragment extends Fragment {
 
-    private static final String TAG = "ParentFragment";
+    private final String TAG = getClass().getSimpleName();
 
     Context fragmentContext;
     private Unbinder mUnbinder;
@@ -27,7 +29,7 @@ abstract class ParentFragment extends Fragment {
 
     public abstract String setScreenTitle();
 
-    public abstract void setupData(@Nullable Bundle savedInstanceState);
+    public abstract void onReady();
 
     public void extractArguments() {
     }
@@ -38,26 +40,31 @@ abstract class ParentFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle
             savedInstanceState) {
-        View view = inflater.inflate(provideLayoutResourceId(), container, false);
+        Log.d(TAG, "onCreateView");
+        View view = getView() != null ? getView() : inflater.inflate(provideLayoutResourceId(), container, false);
         mUnbinder = ButterKnife.bind(this, view);
         return view;
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onViewCreated");
         super.onViewCreated(view, savedInstanceState);
+        Log.d(TAG, "setViewBehaviour");
         setViewBehaviour();
-        setupData(savedInstanceState);
     }
 
     @Override
     public void onStart() {
+        Log.d(TAG, "onStart");
         super.onStart();
+        onReady();
         hostActivity.setTitle(setScreenTitle());
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             extractArguments();
@@ -66,6 +73,7 @@ abstract class ParentFragment extends Fragment {
 
     @Override
     public void onAttach(Context context) {
+        Log.d(TAG, "onAttach");
         super.onAttach(context);
         this.fragmentContext = context;
         this.hostActivity = (ParentActivityImpl) context;
@@ -73,8 +81,45 @@ abstract class ParentFragment extends Fragment {
 
     @Override
     public void onDetach() {
+        Log.d(TAG, "onDetach");
         this.fragmentContext = null;
         super.onDetach();
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d(TAG, "onDestroy");
+        super.onDestroy();
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onViewStateRestored");
+        super.onViewStateRestored(savedInstanceState);
+    }
+
+    @Override
+    public void onDestroyView() {
+        Log.d(TAG, "onDestroyView");
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        Log.d(TAG, "onSaveInstanceState");
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onPause() {
+        Log.d(TAG, "onPause");
+        super.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        Log.d(TAG, "onStop");
+        super.onStop();
     }
 
     void runOnUiThread(Runnable runnable) {
