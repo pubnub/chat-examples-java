@@ -3,13 +3,12 @@ package com.pubnub.crc.chat_snippets_java;
 import com.google.gson.JsonObject;
 import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
-import com.pubnub.api.PubNubException;
-import com.pubnub.api.models.consumer.PNPublishResult;
-import com.pubnub.api.models.consumer.presence.PNHereNowChannelData;
-import com.pubnub.api.models.consumer.presence.PNHereNowOccupantData;
-import com.pubnub.api.models.consumer.presence.PNHereNowResult;
+import com.pubnub.api.callbacks.PNCallback;
+import com.pubnub.api.models.consumer.PNStatus;
+import com.pubnub.api.models.consumer.presence.PNGetStateResult;
 import com.pubnub.api.models.consumer.presence.PNSetStateResult;
 
+import org.awaitility.Awaitility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,30 +16,54 @@ import org.junit.Test;
 import java.util.Collections;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class ConnectToPubNubTest extends TestHarness {
 
-    private PubNub pubNubClient;
+    private PubNub pubNub;
 
     @Before
     public void beforeEach() {
-        pubNubClient = new PubNub(getPnConfiguration());
+        pubNub = new PubNub(getPnConfiguration());
     }
 
     @After
     public void afterEach() {
-        pubNubClient.unsubscribeAll();
-        pubNubClient.forceDestroy();
-        pubNubClient = null;
+        pubNub.unsubscribeAll();
+        pubNub.forceDestroy();
+        pubNub = null;
     }
 
     @Test
-    public void testUuid() {
+    public void testSetup() {
+        /*
         // tag::CON-1[]
+        implementation 'com.pubnub:pubnub-gson:4.22.0-beta'
+        // end::CON-1[]
+        */
+    }
+
+    @Test
+    public void testInitializingPubNub() {
+        // tag::CON-2[]
+        PNConfiguration pnConfiguration = new PNConfiguration();
+        pnConfiguration.setSubscribeKey(SUB_KEY);
+        pnConfiguration.setPublishKey(PUB_KEY);
+
+        PubNub pubNub = new PubNub(pnConfiguration);
+        // end::CON-2[]
+
+        assertNotNull(pubNub);
+        assertNotNull(pubNub.getConfiguration().getUuid());
+    }
+
+    @Test
+    public void testSettingUuid() {
+        // tag::CON-3[]
         String uuid = UUID.randomUUID().toString();
 
         PNConfiguration pnConfiguration = new PNConfiguration();
@@ -49,69 +72,80 @@ public class ConnectToPubNubTest extends TestHarness {
         pnConfiguration.setUuid(uuid);
 
         PubNub pubNub = new PubNub(pnConfiguration);
-        // end::CON-1[]
+        // end::CON-3[]
         assertNotNull(uuid);
         assertNotNull(pubNub);
         assertEquals(uuid, pubNub.getConfiguration().getUuid());
     }
 
     @Test
-    public void testSubscribe() throws PubNubException, InterruptedException {
+    public void testSettingState() {
+        final AtomicBoolean setStateSuccess = new AtomicBoolean(false);
+        // tag::CON-4[]
+        JsonObject state = new JsonObject();
+        state.addProperty("mood", "grumpy");
 
-        pubNubClient.subscribe()
-                .channels(Collections.singletonList("my_channel"))
-                .execute();
+        pubNub.setPresenceState()
+                .state(state)
+                .channels(Collections.singletonList("room-1"))
+                .async(new PNCallback<PNSetStateResult>() {
+                    @Override
+                    public void onResponse(PNSetStateResult result, PNStatus status) {
+                        // tag::ignore[]
+                        assertNotNull(status);
+                        assertNotNull(result);
+                        assertFalse(status.isError());
+                        assertEquals(result.getState(), state);
+                        setStateSuccess.set(true);
+                        // end::ignore[]
+                        if (!status.isError()) {
+                            // handle state setting response
+                        }
+                    }
+                });
+        // end::CON-4[]
+        Awaitility.await().atMost(2, TimeUnit.SECONDS).untilTrue(setStateSuccess);
 
-        Thread.sleep(TimeUnit.SECONDS.toMillis(2));
+        final AtomicBoolean getStateSuccess = new AtomicBoolean(false);
+        // tag::CON-5[]
+        pubNub.getPresenceState()
+                .channels(Collections.singletonList("room-1"))
+                .async(new PNCallback<PNGetStateResult>() {
+                    @Override
+                    public void onResponse(PNGetStateResult result, PNStatus status) {
+                        // tag::ignore[]
+                        assertNotNull(status);
+                        assertNotNull(result);
+                        assertFalse(status.isError());
+                        assertEquals(result.getStateByUUID()
+                                .get("room-1")
+                                .getAsJsonObject()
+                                .get("mood"), state.get("mood"));
+                        getStateSuccess.set(true);
+                        // end::ignore[]
+                        if (!status.isError()) {
+                            // handle state setting response
+                        }
+                    }
+                });
+        // end::CON-5[]
 
-        PNHereNowResult response = pubNubClient.hereNow()
-                .channels(Collections.singletonList("my_channel"))
-                .includeUUIDs(true)
-                .sync();
-
-        assertNotNull(response);
-
-        boolean present = false;
-        PNHereNowChannelData hereNowChannelData = response.getChannels().get("my_channel");
-
-        assertNotNull(hereNowChannelData.getOccupants());
-
-        for (PNHereNowOccupantData occupant : hereNowChannelData.getOccupants()) {
-            if (occupant.getUuid().contains(pubNubClient.getConfiguration().getUuid())) {
-                present = true;
-                break;
-            }
-        }
-
-        assertTrue(present);
+        Awaitility.await().atMost(2, TimeUnit.SECONDS).untilTrue(getStateSuccess);
     }
 
     @Test
-    public void testUserMetadata() throws PubNubException {
-        // tag::CON-3[]
-        JsonObject metadata = new JsonObject();
-        metadata.addProperty("color", "red");
-
-        PNSetStateResult response = pubNubClient.setPresenceState()
-                .channels(Collections.singletonList(UUID.randomUUID().toString()))
-                .state(metadata)
-                .sync();
-        // end::CON-3[]
-        assertNotNull(response);
-        assertEquals(metadata, response.getState().getAsJsonObject());
+    public void testDisconnecting() {
+        // tag::CON-6[]
+        pubNub.unsubscribeAll();
+        // end::CON-6[]
     }
 
     @Test
-    public void testPublish() throws PubNubException {
-        JsonObject message = new JsonObject();
-        message.addProperty("text", UUID.randomUUID().toString());
-
-        PNPublishResult response = pubNubClient.publish()
-                .channel("my_channel")
-                .message(message)
-                .sync();
-
-        assertNotNull(response);
+    public void testReconnectingManually() {
+        // tag::CON-7[]
+        pubNub.reconnect();
+        // end::CON-7[]
     }
 
 }
+
