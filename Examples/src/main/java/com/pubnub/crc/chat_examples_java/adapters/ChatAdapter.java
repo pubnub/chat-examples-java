@@ -1,15 +1,20 @@
 package com.pubnub.crc.chat_examples_java.adapters;
 
+import android.content.Context;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.request.RequestOptions;
 import com.pubnub.crc.chat_examples_java.R;
 import com.pubnub.crc.chat_examples_java.pubnub.Message;
+import com.pubnub.crc.chat_examples_java.util.AndroidUtils;
 import com.pubnub.crc.chat_examples_java.util.GlideApp;
+import com.pubnub.crc.chat_examples_java.util.Helper;
 
 import java.util.List;
 
@@ -82,7 +87,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
 
         @OnClick(R.id.root)
         void rootClick(View v) {
-
+            showMessageInfoDialog(v.getContext(), mMessage);
         }
 
         Message mMessage;
@@ -104,5 +109,23 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
                     .apply(RequestOptions.circleCropTransform())
                     .into(mAvatar);
         }
+    }
+
+    private void showMessageInfoDialog(Context context, Message message) {
+
+        StringBuilder contentBuilder = new StringBuilder("");
+        contentBuilder.append(AndroidUtils.emphasizeText("Sender: "));
+        contentBuilder.append(message.getSenderId());
+        contentBuilder.append(AndroidUtils.newLine());
+        contentBuilder.append(AndroidUtils.emphasizeText("Date time: "));
+        contentBuilder.append(Helper.parseDateTimeIso8601(message.getTimetoken()));
+
+        MaterialDialog materialDialog = new MaterialDialog.Builder(context)
+                .title(R.string.message_info)
+                .content(Html.fromHtml(contentBuilder.toString()))
+                .positiveText(android.R.string.ok)
+                .positiveColor(context.getResources().getColor(R.color.white))
+                .build();
+        materialDialog.show();
     }
 }

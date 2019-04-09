@@ -8,4 +8,5 @@
     <string name="loading">Loading…</string>
     <string name="chat_info">Chat info</string>
     <string name="group_info">Group info</string>
+    <string name="message_info">Message Info</string>
 </resources>
