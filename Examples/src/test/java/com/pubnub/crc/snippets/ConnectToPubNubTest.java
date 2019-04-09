@@ -4,9 +4,13 @@ import com.google.gson.JsonObject;
 import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.PNCallback;
+import com.pubnub.api.callbacks.SubscribeCallback;
+import com.pubnub.api.enums.PNOperationType;
 import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.presence.PNGetStateResult;
 import com.pubnub.api.models.consumer.presence.PNSetStateResult;
+import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
+import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 
 import org.awaitility.Awaitility;
 import org.junit.After;
@@ -131,15 +135,65 @@ public class ConnectToPubNubTest extends TestHarness {
         // end::CON-5[]
 
         Awaitility.await().atMost(2, TimeUnit.SECONDS).untilTrue(getStateSuccess);
-
-        // todo crash it
     }
 
     @Test
     public void testDisconnecting() {
-        // tag::CON-6[]
-        pubNub.unsubscribeAll();
-        // end::CON-6[]
+        final AtomicBoolean unsubscribedSuccess = new AtomicBoolean(false);
+
+        PubNub observerClient = new PubNub(getPnConfiguration());
+
+        observerClient.addListener(new SubscribeCallback() {
+            @Override
+            public void status(PubNub pubnub, PNStatus status) {
+                if (status.getOperation() == PNOperationType.PNSubscribeOperation) {
+                    pubNub.subscribe()
+                            .channels(Collections.singletonList("room-1"))
+                            .execute();
+                }
+            }
+
+            @Override
+            public void message(PubNub pubnub, PNMessageResult message) {
+
+            }
+
+            @Override
+            public void presence(PubNub pubnub, PNPresenceEventResult presence) {
+                if (presence.getEvent().equals("leave") && presence.getUuid()
+                        .equals(pubNub.getConfiguration().getUuid())) {
+                    unsubscribedSuccess.set(true);
+                }
+            }
+        });
+
+        observerClient.subscribe()
+                .channels(Collections.singletonList("room-1"))
+                .withPresence()
+                .execute();
+
+        pubNub.addListener(new SubscribeCallback() {
+            @Override
+            public void status(PubNub pubnub, PNStatus status) {
+                if (status.getOperation() == PNOperationType.PNSubscribeOperation) {
+                    // tag::CON-6[]
+                    pubNub.unsubscribeAll();
+                    // end::CON-6[]
+                }
+            }
+
+            @Override
+            public void message(PubNub pubnub, PNMessageResult message) {
+
+            }
+
+            @Override
+            public void presence(PubNub pubnub, PNPresenceEventResult presence) {
+
+            }
+        });
+
+        Awaitility.await().atMost(2, TimeUnit.SECONDS).untilTrue(unsubscribedSuccess);
     }
 
     @Test
