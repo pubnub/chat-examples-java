@@ -3,11 +3,15 @@ package com.pubnub.crc.chat_examples_java.fragments;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.PNCallback;
+import com.pubnub.api.callbacks.SubscribeCallback;
 import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.presence.PNHereNowChannelData;
 import com.pubnub.api.models.consumer.presence.PNHereNowOccupantData;
 import com.pubnub.api.models.consumer.presence.PNHereNowResult;
+import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
+import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 import com.pubnub.crc.chat_examples_java.R;
 import com.pubnub.crc.chat_examples_java.adapters.UserAdapter;
 import com.pubnub.crc.chat_examples_java.model.Users;
@@ -39,6 +43,7 @@ public class ChatInfoFragment extends ParentFragment {
     List<User> mUsers = new ArrayList<>();
 
     private String mChannel;
+    private SubscribeCallback mPubNubListener;
 
     static ChatInfoFragment newInstance(String channel) {
         Bundle args = new Bundle();
@@ -59,6 +64,10 @@ public class ChatInfoFragment extends ParentFragment {
         mUsersRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mUserAdapter = new UserAdapter(mChannel, mUsers);
         mUsersRecyclerView.setAdapter(mUserAdapter);
+        mChannelName.setText(mChannel);
+        mDescription.setText(R.string.lorem_ipsum_long);
+
+        fetchAvailableUsers();
     }
 
     @Override
@@ -68,9 +77,53 @@ public class ChatInfoFragment extends ParentFragment {
 
     @Override
     public void onReady() {
-        mChannelName.setText(mChannel);
-        mDescription.setText(R.string.lorem_ipsum_long);
-        fetchAvailableUsers();
+        initListener();
+    }
+
+    private void initListener() {
+        mPubNubListener = new SubscribeCallback() {
+            @Override
+            public void status(PubNub pubnub, PNStatus status) {
+
+            }
+
+            @Override
+            public void message(PubNub pubnub, PNMessageResult message) {
+
+            }
+
+            @Override
+            public void presence(PubNub pubnub, PNPresenceEventResult presence) {
+
+                if (presence.getUuid() == null) {
+                    return;
+                }
+
+                switch (presence.getEvent()) {
+                    case "join":
+                        mUsers.add(User.newBuilder().user(Users.getUserById(presence.getUuid())).build());
+                        break;
+                    case "leave":
+                    case "timeout":
+                        mUsers.remove(User.newBuilder().user(Users.getUserById(presence.getUuid())).build());
+                        break;
+                    case "interval":
+                        for (String uuid : presence.getJoin()) {
+                            mUsers.add(User.newBuilder().user(Users.getUserById(uuid)).build());
+                        }
+                        for (String uuid : presence.getLeave()) {
+                            mUsers.remove(User.newBuilder().user(Users.getUserById(uuid)).build());
+                        }
+                        for (String uuid : presence.getTimeout()) {
+                            mUsers.remove(User.newBuilder().user(Users.getUserById(uuid)).build());
+                        }
+                        break;
+                    case "state-change":
+                        break;
+                }
+                runOnUiThread(() -> mUserAdapter.notifyDataSetChanged());
+            }
+        };
     }
 
     @Override
@@ -94,7 +147,6 @@ public class ChatInfoFragment extends ParentFragment {
                             for (PNHereNowOccupantData occupant : hereNowChannelData.getOccupants()) {
                                 mUsers.add(User.newBuilder()
                                         .user(Users.getUserById(occupant.getUuid()))
-                                        .status("Available")
                                         .build());
                             }
                             mUserAdapter.notifyDataSetChanged();
@@ -103,5 +155,10 @@ public class ChatInfoFragment extends ParentFragment {
                         }
                     }
                 });
+    }
+
+    @Override
+    public SubscribeCallback provideListener() {
+        return mPubNubListener;
     }
 }
