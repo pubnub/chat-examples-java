@@ -1,14 +1,17 @@
 apply plugin: 'com.android.application'
+apply plugin: 'checkstyle'
 
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "com.pubnub.crc.chat_examples_java"
+        applicationId "com.pubnub.crc.sample"
         minSdkVersion 16
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
         vectorDrawables.useSupportLibrary = true
+        buildConfigField "String", "PUB_KEY", PUB_KEY
+        buildConfigField "String", "SUB_KEY", SUB_KEY
     }
     buildTypes {
         release {
@@ -25,6 +28,13 @@ android {
     }
 }
 
+def configDir = "${project.rootDir}/config/checkstyle"
+checkstyle {
+    toolVersion = "8.14"
+    configFile file("$configDir/checkstyle.xml")
+}
+check.dependsOn('checkstyle')
+
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.0.2'
@@ -38,4 +48,8 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
 
     implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
+
+    implementation 'com.pubnub:pubnub-gson:4.22.0-beta'
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.awaitility:awaitility:3.1.5'
 }

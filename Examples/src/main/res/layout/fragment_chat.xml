@@ -16,13 +16,13 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <com.pubnub.crc.chat_examples_java.view.MessageComposer
+    <com.pubnub.crc.sample.view.MessageComposer
         android:id="@+id/chats_message_composer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true" />
 
-    <com.pubnub.crc.chat_examples_java.view.ProgressView
+    <com.pubnub.crc.sample.view.ProgressView
         android:id="@+id/chat_progress_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

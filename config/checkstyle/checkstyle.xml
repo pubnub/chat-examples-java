@@ -38,6 +38,8 @@
         <property name="basedir" value="${basedir}"/>
     -->
 
+    <property name="severity" value="error"/>
+
     <property name="fileExtensions" value="java, properties, xml" />
 
     <!-- Checks that a package-info.java file exists for each package.
