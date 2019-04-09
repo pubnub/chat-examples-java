@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:windowBackground"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/info_channel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        tools:text="Animal chat" />
+
+    <TextView
+        android:id="@+id/info_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/info_channel"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:textSize="14sp"
+        tools:text="@string/lorem_ipsum_long" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/info_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/info_description" />
+
+</RelativeLayout>

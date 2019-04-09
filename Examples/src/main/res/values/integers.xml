@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <fraction name="fragment_animation_fraction_positive">20%</fraction>
+    <fraction name="fragment_animation_fraction_negative">-20%</fraction>
+
+    <integer name="fragment_animation_duration">200</integer>
+    <integer name="entry_activity_animation_duration">300</integer>
+    <integer name="glide_animation_duration">250</integer>
+    <integer name="login_logo_animation_duration">200</integer>
+</resources>

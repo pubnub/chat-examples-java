@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shareInterpolator="false">
+    <translate
+        android:duration="@integer/fragment_animation_duration"
+        android:fromXDelta="@fraction/fragment_animation_fraction_positive"
+        android:fromYDelta="0%"
+        android:interpolator="@anim/interpolator"
+        android:toXDelta="0%"
+        android:toYDelta="0%" />
+    <alpha
+        android:duration="@integer/fragment_animation_duration"
+        android:fromAlpha="0.0"
+        android:interpolator="@anim/interpolator"
+        android:toAlpha="1.0" />
+</set>

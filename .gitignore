@@ -37,3 +37,4 @@ captures/
 # IntelliJ
 *.iml
 .idea/
+/Examples/gradle.properties

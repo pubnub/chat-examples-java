@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">Chat Examples</string>
+    <string name="send_a_message">Send a message…</string>
+    <string name="lorem_ipsum_short" translatable="false">Lorem ipsum dolor sit amet.</string>
+    <string name="lorem_ipsum_long" translatable="false">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse pharetra blandit nisi in porta. Suspendisse sed libero iaculis, posuere nunc id, dictum lectus. Integer sagittis nulla vitae nisl ornare porta. Maecenas ut sagittis erat. Quisque egestas eu lorem ac facilisis. Nulla ultricies enim vel arcu scelerisque viverra.</string>
+    <string name="send">Send</string>
+    <string name="attach">Attach</string>
+    <string name="loading">Loading…</string>
+    <string name="chat_info">Chat info</string>
+    <string name="group_info">Group info</string>
+    <string name="message_info">Message Info</string>
 </resources>
