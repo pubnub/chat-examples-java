@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.pubnub.crc.chat_examples_java.util.PNFragment;
 import com.pubnub.crc.chat_examples_java.util.ParentActivityImpl;
 
 import androidx.annotation.NonNull;
@@ -16,7 +17,7 @@ import androidx.fragment.app.Fragment;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-abstract class ParentFragment extends Fragment {
+abstract class ParentFragment extends Fragment implements PNFragment {
 
     private final String TAG = getClass().getSimpleName();
 
@@ -58,7 +59,6 @@ abstract class ParentFragment extends Fragment {
     public void onStart() {
         Log.d(TAG, "onStart");
         super.onStart();
-        onReady();
         hostActivity.setTitle(setScreenTitle());
     }
 
@@ -66,6 +66,9 @@ abstract class ParentFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onReady");
+        onReady();
+        hostActivity.getPubNub().addListener(provideListener());
         if (getArguments() != null) {
             extractArguments();
         }
@@ -89,6 +92,7 @@ abstract class ParentFragment extends Fragment {
     @Override
     public void onDestroy() {
         Log.d(TAG, "onDestroy");
+        hostActivity.getPubNub().removeListener(provideListener());
         super.onDestroy();
     }
 

@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -61,12 +60,6 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
         ChatFragment fragment = new ChatFragment();
         fragment.setArguments(args);
         return fragment;
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        addPubNubListener();
     }
 
     @Override
@@ -129,10 +122,10 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
 
     @Override
     public void onReady() {
-
+        initListener();
     }
 
-    private void addPubNubListener() {
+    private void initListener() {
         mPubNubListener = new SubscribeCallback() {
             @Override
             public void status(PubNub pubnub, PNStatus status) {
@@ -150,7 +143,6 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
 
             }
         };
-        hostActivity.getPubNub().addListener(mPubNubListener);
     }
 
     private void handleNewMessage(PNMessageResult message) {
@@ -202,5 +194,10 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
 
     private void scrollChatToBottom() {
         mChatsRecyclerView.scrollToPosition(mMessages.size() - 1);
+    }
+
+    @Override
+    public SubscribeCallback provideListener() {
+        return mPubNubListener;
     }
 }

@@ -23,4 +23,12 @@ public class AndroidUtils {
             inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
+
+    public static String emphasizeText(String text) {
+        return "<b>" + text + "</b>";
+    }
+
+    public static String newLine() {
+        return "<br>";
+    }
 }

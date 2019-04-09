@@ -34,6 +34,7 @@ public class MainActivity extends ParentActivity implements ParentActivityImpl {
         setSupportActionBar(mToolbar);
         initializePubNub();
         addFragment(ChatFragment.newInstance("demo-animal-chat"));
+        /*Log.d("sekure", BuildConfig.DB_FILEPATH);*/
     }
 
     @Override
@@ -74,4 +75,9 @@ public class MainActivity extends ParentActivity implements ParentActivityImpl {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        getPubNub().unsubscribeAll();
+        super.onDestroy();
+    }
 }

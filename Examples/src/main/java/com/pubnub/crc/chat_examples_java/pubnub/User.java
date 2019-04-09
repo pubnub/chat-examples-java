@@ -2,6 +2,8 @@ package com.pubnub.crc.chat_examples_java.pubnub;
 
 import com.pubnub.crc.chat_examples_java.model.Users;
 
+import androidx.annotation.Nullable;
+
 public class User {
 
     private Users.User user;
@@ -10,6 +12,7 @@ public class User {
     private User(Builder builder) {
         user = builder.user;
         status = builder.status;
+        status = "Available";
     }
 
     public static Builder newBuilder() {
@@ -45,5 +48,13 @@ public class User {
 
     public String getStatus() {
         return status;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj instanceof User) {
+            return ((User) obj).user.getUuid().equals(user.getUuid());
+        }
+        return super.equals(obj);
     }
 }
