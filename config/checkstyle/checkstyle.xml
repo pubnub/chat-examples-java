@@ -38,7 +38,7 @@
         <property name="basedir" value="${basedir}"/>
     -->
 
-    <property name="severity" value="error"/>
+    <property name="severity" value="warning" />
 
     <property name="fileExtensions" value="java, properties, xml" />
 
@@ -151,6 +151,7 @@
         <!-- Checks for blocks. You know, those {}'s         -->
         <!-- See http://checkstyle.sf.net/config_blocks.html -->
         <module name="AvoidNestedBlocks" />
+        <module name="EmptyBlock" />
         <module name="LeftCurly" />
         <module name="NeedBraces" />
         <module name="RightCurly" />
@@ -160,9 +161,7 @@
         <!--<module name="AvoidInlineConditionals"/> -->
         <module name="EmptyStatement" />
         <module name="EqualsHashCode" />
-        <module name="HiddenField">
-            <property name="ignoreFormat" value="pubNub" />
-        </module>
+        <module name="HiddenField" />
         <module name="IllegalInstantiation" />
         <module name="InnerAssignment" />
         <module name="MagicNumber" />
@@ -181,7 +180,9 @@
         <!-- See http://checkstyle.sf.net/config_misc.html -->
         <module name="ArrayTypeStyle" />
         <!-- <module name="FinalParameters"/> -->
-        <!-- <module name="TodoComment"/> -->
+        <module name="TodoComment">
+            <property name="format" value="(TODO)" />
+        </module>
         <module name="UpperEll" />
 
     </module>
