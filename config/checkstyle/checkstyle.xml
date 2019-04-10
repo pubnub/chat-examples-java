@@ -38,7 +38,7 @@
         <property name="basedir" value="${basedir}"/>
     -->
 
-    <property name="severity" value="error"/>
+    <property name="severity" value="error" />
 
     <property name="fileExtensions" value="java, properties, xml" />
 
@@ -151,6 +151,7 @@
         <!-- Checks for blocks. You know, those {}'s         -->
         <!-- See http://checkstyle.sf.net/config_blocks.html -->
         <module name="AvoidNestedBlocks" />
+        <!--<module name="EmptyBlock" />-->
         <module name="LeftCurly" />
         <module name="NeedBraces" />
         <module name="RightCurly" />
@@ -165,7 +166,9 @@
         </module>
         <module name="IllegalInstantiation" />
         <module name="InnerAssignment" />
-        <module name="MagicNumber" />
+        <module name="MagicNumber">
+            <property name="ignoreFieldDeclaration" value="true" />
+        </module>
         <module name="MissingSwitchDefault" />
         <module name="SimplifyBooleanExpression" />
         <module name="SimplifyBooleanReturn" />
@@ -175,13 +178,17 @@
         <!-- <module name="DesignForExtension"/> -->
         <module name="HideUtilityClassConstructor" />
         <module name="InterfaceIsType" />
-        <module name="VisibilityModifier" />
+        <module name="VisibilityModifier">
+            <property name="packageAllowed" value="true" />
+        </module>
 
         <!-- Miscellaneous other checks.                   -->
         <!-- See http://checkstyle.sf.net/config_misc.html -->
         <module name="ArrayTypeStyle" />
         <!-- <module name="FinalParameters"/> -->
-        <!-- <module name="TodoComment"/> -->
+        <module name="TodoComment">
+            <property name="format" value="(TODO)" />
+        </module>
         <module name="UpperEll" />
 
     </module>

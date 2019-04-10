@@ -21,8 +21,7 @@ let changeEnd = null;
 let changeLog = null;
 
 // Samples location.
-const samplesPath = [currentRepositoryPath, 'Examples', 'src', 'test', 'java'].join('/');
-
+const samplesPath = [currentRepositoryPath, 'app', 'snippets'].join('/');
 
 // Update retry configuration.
 const updateRetryCount = 3;
