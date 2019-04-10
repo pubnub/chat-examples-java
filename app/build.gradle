@@ -58,8 +58,6 @@ task checkstyle(type: Checkstyle) {
     classpath = files()
 }
 
-print 'heyyy ' + android.sourceSets.main.java.srcDirs
-
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.0.2'
