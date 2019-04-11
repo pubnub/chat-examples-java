@@ -2,7 +2,6 @@ package chatresourcecenter;
 
 import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
-import com.pubnub.api.enums.PNLogVerbosity;
 
 import org.junit.After;
 import org.junit.Before;
@@ -45,8 +44,12 @@ abstract class TestHarness {
         PNConfiguration pnConfiguration = new PNConfiguration();
         pnConfiguration.setSubscribeKey(SUB_KEY);
         pnConfiguration.setPublishKey(PUB_KEY);
-        pnConfiguration.setLogVerbosity(PNLogVerbosity.BODY);
+        /*pnConfiguration.setLogVerbosity(PNLogVerbosity.BODY);*/
         return pnConfiguration;
+    }
+
+    public String getUuid() {
+        return pubNub.getConfiguration().getUuid();
     }
 
 }

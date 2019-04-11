@@ -2,6 +2,8 @@ package chatresourcecenter;
 
 import com.pubnub.api.enums.PNOperationType;
 import com.pubnub.api.models.consumer.PNStatus;
+import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
+import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,6 +23,24 @@ public class PnUtils {
                 && status.getAffectedChannelGroups().contains(group);
     }
 
+    public static boolean isUnsubscribed(PNStatus status, String channel, String uuid) {
+        return status.getOperation() == PNOperationType.PNUnsubscribeOperation
+                && status.getAffectedChannels().contains(channel)
+                && status.getUuid().equals(uuid);
+    }
+
+    public static boolean isUnsubscribedGroup(PNStatus status, String group, String uuid) {
+        return status.getOperation() == PNOperationType.PNUnsubscribeOperation
+                && status.getAffectedChannelGroups().contains(group)
+                && status.getUuid().equals(uuid);
+    }
+
+    public static boolean checkPresence(PNPresenceEventResult presence, String uuid, String event, String channel) {
+        return presence.getEvent().equals(event)
+                && presence.getUuid().equals(uuid)
+                && presence.getChannel().equals(channel);
+    }
+
     public static void printStatus(PNStatus status) {
         StringBuilder logBuilder = new StringBuilder("");
         logBuilder.append("Operation: ").append(status.getOperation()).append("\n");
@@ -32,5 +52,21 @@ public class PnUtils {
                 .append("\n");
         System.out.println(logBuilder.toString());
 
+    }
+
+    public static void printMessageMeta(PNMessageResult message) {
+        StringBuilder logBuilder = new StringBuilder("");
+        logBuilder.append("Channel: ").append(message.getChannel()).append("\n");
+        logBuilder.append("Subscription: ").append(message.getSubscription()).append("\n");
+        System.out.println(logBuilder.toString());
+
+    }
+
+    public static void printPresence(PNPresenceEventResult presence) {
+        StringBuilder logBuilder = new StringBuilder("");
+        logBuilder.append("UUID: ").append(presence.getUuid()).append("\n");
+        logBuilder.append("Event: ").append(presence.getEvent()).append("\n");
+        logBuilder.append("Channel: ").append(presence.getChannel()).append("\n");
+        System.out.println(logBuilder.toString());
     }
 }
