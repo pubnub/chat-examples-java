@@ -5,10 +5,12 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
+import com.pubnub.api.enums.PNOperationType;
 import com.pubnub.api.models.consumer.PNPublishResult;
 import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
@@ -19,18 +21,19 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import resourcecenterdemo.R;
-import resourcecenterdemo.adapters.ChatAdapter;
-import resourcecenterdemo.prefs.Prefs;
-import resourcecenterdemo.pubnub.Message;
-import resourcecenterdemo.view.MessageComposer;
-import resourcecenterdemo.view.ProgressView;
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import butterknife.BindView;
+import resourcecenterdemo.R;
+import resourcecenterdemo.adapters.ChatAdapter;
+import resourcecenterdemo.prefs.Prefs;
+import resourcecenterdemo.pubnub.History;
+import resourcecenterdemo.pubnub.Message;
+import resourcecenterdemo.view.MessageComposer;
 
 public class ChatFragment extends ParentFragment implements MessageComposer.Listener {
 
@@ -45,14 +48,15 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
     @BindView(R.id.chats_message_composer)
     MessageComposer mMessageComposer;
 
-    @BindView(R.id.chat_progress_view)
-    ProgressView mProgressView;
-
     ChatAdapter mChatAdapter;
     List<Message> mMessages = new ArrayList<>();
 
     private String mChannel;
     private SubscribeCallback mPubNubListener;
+
+    private RecyclerView.OnScrollListener mOnScrollListener;
+    private int topItemOffset = 3;
+    private int historyChunkSize = 10;
 
     public static ChatFragment newInstance(String channel) {
         Bundle args = new Bundle();
@@ -68,11 +72,24 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
     }
 
     @Override
-    public void setViewBehaviour() {
+    public void setViewBehaviour(boolean viewFromCache) {
         setHasOptionsMenu(true);
 
+        initializeScrollListener();
+
+        prepareRecyclerView();
+
+        if (!viewFromCache) {
+            mSwipeRefreshLayout.setRefreshing(true);
+            subscribe();
+            fetchHistory();
+        }
+    }
+
+    private void prepareRecyclerView() {
+
         mSwipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorPrimary));
-        mSwipeRefreshLayout.setEnabled(false);
+        mSwipeRefreshLayout.setOnRefreshListener(this::fetchHistory);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(fragmentContext);
         linearLayoutManager.setReverseLayout(false);
@@ -90,7 +107,22 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
 
         mMessageComposer.setListener(this);
 
-        subscribe();
+        mChatsRecyclerView.addOnScrollListener(mOnScrollListener);
+    }
+
+    private void initializeScrollListener() {
+        mOnScrollListener = new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int firstCompletelyVisibleItemPosition =
+                        ((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+
+                if (firstCompletelyVisibleItemPosition == topItemOffset && dy < 0) {
+                    fetchHistory();
+                }
+            }
+        };
     }
 
     @Override
@@ -111,6 +143,7 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
 
     @Override
     public String setScreenTitle() {
+        scrollChatToBottom();
         return mChannel;
     }
 
@@ -129,7 +162,10 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
         mPubNubListener = new SubscribeCallback() {
             @Override
             public void status(PubNub pubnub, PNStatus status) {
-                mProgressView.setEnabled(false);
+                if (status.getOperation() == PNOperationType.PNSubscribeOperation && status.getAffectedChannels()
+                        .contains(mChannel)) {
+                    mSwipeRefreshLayout.setRefreshing(false);
+                }
             }
 
             @Override
@@ -168,6 +204,38 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
                 .execute();
     }
 
+    private void fetchHistory() {
+        mSwipeRefreshLayout.setRefreshing(true);
+        History.getAllMessages(hostActivity.getPubNub(), mChannel, getEarliestTimestamp(), historyChunkSize,
+                new History.CallbackSkeleton() {
+                    @Override
+                    public void handleResponse(List<Message> messages) {
+                        runOnUiThread(() -> {
+                            mSwipeRefreshLayout.setRefreshing(false);
+                            if (!messages.isEmpty()) {
+                                mMessages.addAll(0, messages);
+                                mChatAdapter.notifyItemRangeInserted(0, messages.size());
+                            } else if (mMessages.isEmpty()) {
+                                Toast.makeText(fragmentContext, getString(R.string.channel_empty),
+                                        Toast.LENGTH_SHORT)
+                                        .show();
+                            } else {
+                                Toast.makeText(fragmentContext, getString(R.string.no_more_messages),
+                                        Toast.LENGTH_SHORT)
+                                        .show();
+                            }
+                        });
+                    }
+                });
+    }
+
+    private Long getEarliestTimestamp() {
+        if (mMessages != null && !mMessages.isEmpty()) {
+            return mMessages.get(0).getTimetoken();
+        }
+        return null;
+    }
+
     @Override
     public void onDestroy() {
         hostActivity.getPubNub().removeListener(mPubNubListener);
@@ -176,11 +244,13 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
 
     @Override
     public void onSentClick(String message) {
-        if (TextUtils.isEmpty(message))
+        if (TextUtils.isEmpty(message)) {
             message = UUID.randomUUID().toString();
+        }
         hostActivity.getPubNub()
                 .publish()
                 .channel(mChannel)
+                .shouldStore(true)
                 .message(Message.newBuilder().senderId(Prefs.get().uuid()).text(message).build())
                 .async(new PNCallback<PNPublishResult>() {
                     @Override

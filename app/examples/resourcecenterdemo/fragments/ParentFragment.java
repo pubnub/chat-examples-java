@@ -8,25 +8,26 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import resourcecenterdemo.util.PNFragment;
-import resourcecenterdemo.util.ParentActivityImpl;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import resourcecenterdemo.util.PNFragment;
+import resourcecenterdemo.util.ParentActivityImpl;
 
 abstract class ParentFragment extends Fragment implements PNFragment {
 
-    private final String TAG = getClass().getSimpleName();
+    private final String TAG = "PF_" + getClass().getSimpleName();
 
     Context fragmentContext;
     private Unbinder mUnbinder;
+    private boolean mIsFromCache;
+    private boolean mRestored;
 
     public abstract int provideLayoutResourceId();
 
-    public abstract void setViewBehaviour();
+    public abstract void setViewBehaviour(boolean viewFromCache);
 
     public abstract String setScreenTitle();
 
@@ -42,8 +43,16 @@ abstract class ParentFragment extends Fragment implements PNFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle
             savedInstanceState) {
         Log.d(TAG, "onCreateView");
-        View view = getView() != null ? getView() : inflater.inflate(provideLayoutResourceId(), container, false);
+        View view;
+        if (getView() != null) {
+            view = getView();
+            mIsFromCache = true;
+        } else {
+            view = inflater.inflate(provideLayoutResourceId(), container, false);
+            mIsFromCache = false;
+        }
         mUnbinder = ButterKnife.bind(this, view);
+        Log.d(TAG, "onCreateView " + mIsFromCache);
         return view;
     }
 
@@ -51,8 +60,8 @@ abstract class ParentFragment extends Fragment implements PNFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onViewCreated");
         super.onViewCreated(view, savedInstanceState);
-        Log.d(TAG, "setViewBehaviour");
-        setViewBehaviour();
+        Log.d(TAG, "setViewBehaviour, cache: " + mIsFromCache);
+        setViewBehaviour(mRestored);
     }
 
     @Override
@@ -66,6 +75,7 @@ abstract class ParentFragment extends Fragment implements PNFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
+        mRestored = false;
         Log.d(TAG, "onReady");
         onReady();
         hostActivity.getPubNub().addListener(provideListener());
@@ -105,6 +115,7 @@ abstract class ParentFragment extends Fragment implements PNFragment {
     @Override
     public void onDestroyView() {
         Log.d(TAG, "onDestroyView");
+        mRestored = true;
         super.onDestroyView();
     }
 
