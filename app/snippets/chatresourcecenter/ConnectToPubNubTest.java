@@ -132,6 +132,7 @@ public class ConnectToPubNubTest extends TestHarness {
                 if (PnUtils.isSubscribed(status, "room-1")) {
                     pubNub.subscribe()
                             .channels(Collections.singletonList("room-1"))
+                            .withPresence()
                             .execute();
                 }
             }
@@ -143,6 +144,7 @@ public class ConnectToPubNubTest extends TestHarness {
 
             @Override
             public void presence(PubNub pubnub, PNPresenceEventResult presence) {
+                PnUtils.printPresence(presence);
                 if (presence.getEvent().equals("leave") && presence.getUuid()
                         .equals(pubNub.getConfiguration().getUuid())) {
                     unsubscribedSuccess.set(true);
@@ -156,6 +158,13 @@ public class ConnectToPubNubTest extends TestHarness {
                 if (status.getOperation() == PNOperationType.PNSubscribeOperation) {
                     // tag::CON-6[]
                     pubNub.unsubscribeAll();
+                    // tag::ignore[]
+                    try {
+                        TimeUnit.SECONDS.sleep(TIMEOUT);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    // tag::ignore[]
                     pubNub.destroy();
                     // end::CON-6[]
                 }
@@ -186,7 +195,6 @@ public class ConnectToPubNubTest extends TestHarness {
         pubNub.getConfiguration().setReconnectionPolicy(PNReconnectionPolicy.LINEAR);
         pubNub.reconnect();
         // end::CON-7[]
-
     }
 
 }
