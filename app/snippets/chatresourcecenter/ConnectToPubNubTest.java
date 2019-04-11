@@ -6,6 +6,7 @@ import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
 import com.pubnub.api.enums.PNOperationType;
+import com.pubnub.api.enums.PNReconnectionPolicy;
 import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.presence.PNGetStateResult;
 import com.pubnub.api.models.consumer.presence.PNSetStateResult;
@@ -51,9 +52,9 @@ public class ConnectToPubNubTest extends TestHarness {
 
     @Test
     public void testSettingUuid() {
-        // tag::CON-3[]
-        String uuid = UUID.randomUUID().toString();
 
+        String uuid = UUID.randomUUID().toString();
+        // tag::CON-3[]
         PNConfiguration pnConfiguration = new PNConfiguration();
         pnConfiguration.setSubscribeKey(SUB_KEY);
         pnConfiguration.setPublishKey(PUB_KEY);
@@ -155,6 +156,7 @@ public class ConnectToPubNubTest extends TestHarness {
                 if (status.getOperation() == PNOperationType.PNSubscribeOperation) {
                     // tag::CON-6[]
                     pubNub.unsubscribeAll();
+                    pubNub.destroy();
                     // end::CON-6[]
                 }
             }
@@ -181,8 +183,10 @@ public class ConnectToPubNubTest extends TestHarness {
     @Test
     public void testReconnectingManually() {
         // tag::CON-7[]
+        pubNub.getConfiguration().setReconnectionPolicy(PNReconnectionPolicy.LINEAR);
         pubNub.reconnect();
         // end::CON-7[]
+
     }
 
 }
