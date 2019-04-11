@@ -176,7 +176,7 @@ public class ManageChannelsTest extends TestHarness {
         pubNub.subscribe()
                 .channelGroups(Arrays.asList("family"))
                 .execute();
-        // tag::CHAN-4[]
+        // end::CHAN-4[]
 
         Awaitility.await().atMost(TIMEOUT, TimeUnit.SECONDS).untilTrue(joinSuccess);
     }
