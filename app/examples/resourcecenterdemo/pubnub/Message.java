@@ -17,7 +17,7 @@ public class Message {
         text = builder.text;
         timetoken = builder.timetoken;
         isOwnMessage = senderId.equals(Prefs.get().uuid());
-        timestamp = Helper.parseDateTime(timetoken);
+        timestamp = Helper.parseTime(timetoken / 10_000L);
         user = Users.getUserById(senderId);
     }
 

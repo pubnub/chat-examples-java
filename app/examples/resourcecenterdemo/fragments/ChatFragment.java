@@ -56,7 +56,7 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
 
     private RecyclerView.OnScrollListener mOnScrollListener;
     private int topItemOffset = 3;
-    private int historyChunkSize = 10;
+    private int historyChunkSize = 20;
 
     public static ChatFragment newInstance(String channel) {
         Bundle args = new Bundle();
@@ -186,7 +186,7 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
             Message msg = Message.newBuilder()
                     .senderId(message.getMessage().getAsJsonObject().get("senderId").getAsString())
                     .text(message.getMessage().getAsJsonObject().get("text").getAsString())
-                    .timetoken(message.getTimetoken() / 10_000L)
+                    .timetoken(message.getTimetoken())
                     .build();
             mMessages.add(msg);
             runOnUiThread(() -> {

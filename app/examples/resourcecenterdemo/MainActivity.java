@@ -6,6 +6,7 @@ import android.widget.FrameLayout;
 import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.enums.PNLogVerbosity;
+import com.pubnub.api.enums.PNReconnectionPolicy;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
@@ -46,6 +47,7 @@ public class MainActivity extends ParentActivity implements ParentActivityImpl {
         pnConfiguration.setSubscribeKey(BuildConfig.SUB_KEY);
         pnConfiguration.setUuid(Prefs.get().uuid());
         pnConfiguration.setLogVerbosity(PNLogVerbosity.BODY);
+        pnConfiguration.setReconnectionPolicy(PNReconnectionPolicy.LINEAR);
         mPubNub = new PubNub(pnConfiguration);
     }
 
@@ -76,6 +78,7 @@ public class MainActivity extends ParentActivity implements ParentActivityImpl {
     @Override
     protected void onDestroy() {
         getPubNub().unsubscribeAll();
+        getPubNub().forceDestroy();
         super.onDestroy();
     }
 }
