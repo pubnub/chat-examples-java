@@ -168,6 +168,7 @@
         <module name="InnerAssignment" />
         <module name="MagicNumber">
             <property name="ignoreFieldDeclaration" value="true" />
+            <property name="ignoreNumbers" value="10000" />
         </module>
         <module name="MissingSwitchDefault" />
         <module name="SimplifyBooleanExpression" />
