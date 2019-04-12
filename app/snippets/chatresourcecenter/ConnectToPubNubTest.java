@@ -164,7 +164,7 @@ public class ConnectToPubNubTest extends TestHarness {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    // tag::ignore[]
+                    // end::ignore[]
                     pubNub.destroy();
                     // end::CON-6[]
                 }

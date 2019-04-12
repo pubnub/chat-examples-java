@@ -13,16 +13,16 @@ import com.bumptech.glide.request.RequestOptions;
 
 import java.util.List;
 
-import resourcecenterdemo.R;
-import resourcecenterdemo.pubnub.Message;
-import resourcecenterdemo.util.AndroidUtils;
-import resourcecenterdemo.util.GlideApp;
-import resourcecenterdemo.util.Helper;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import resourcecenterdemo.R;
+import resourcecenterdemo.pubnub.Message;
+import resourcecenterdemo.util.AndroidUtils;
+import resourcecenterdemo.util.GlideApp;
+import resourcecenterdemo.util.Helper;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHolder> {
 
@@ -118,7 +118,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
         contentBuilder.append(message.getSenderId());
         contentBuilder.append(AndroidUtils.newLine());
         contentBuilder.append(AndroidUtils.emphasizeText("Date time: "));
-        contentBuilder.append(Helper.parseDateTimeIso8601(message.getTimetoken()));
+        contentBuilder.append(Helper.parseDateTime(message.getTimetoken() / 10_000L));
 
         MaterialDialog materialDialog = new MaterialDialog.Builder(context)
                 .title(R.string.message_info)

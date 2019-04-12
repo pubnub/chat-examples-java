@@ -37,7 +37,7 @@ public class Helper {
         }
     }
 
-    public static String parseDateTime(long timetoken) {
+    public static String parseTime(long timetoken) {
         @SuppressLint("SimpleDateFormat")
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
         Calendar calendar = Calendar.getInstance();
@@ -48,6 +48,14 @@ public class Helper {
     public static String parseDateTimeIso8601(long timetoken) {
         @SuppressLint("SimpleDateFormat")
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timetoken);
+        return sdf.format(calendar.getTime());
+    }
+
+    public static String parseDateTime(long timetoken) {
+        @SuppressLint("SimpleDateFormat")
+        SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy HH:mm:ss");
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(timetoken);
         return sdf.format(calendar.getTime());

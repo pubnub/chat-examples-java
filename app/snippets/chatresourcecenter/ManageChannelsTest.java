@@ -207,7 +207,7 @@ public class ManageChannelsTest extends TestHarness {
                                         addSuccess.set(true);
                                     }
                                 });
-                        // tag::ignore[]
+                        // end::ignore[]
                     }
                 });
         // end::CHAN-5[]
@@ -240,7 +240,7 @@ public class ManageChannelsTest extends TestHarness {
                             e.printStackTrace();
                             leaveSuccess.set(false);
                         }
-                        // tag::ignore[]
+                        // end::ignore[]
                     }
                 });
         // end::CHAN-6[]
@@ -266,7 +266,7 @@ public class ManageChannelsTest extends TestHarness {
                         assertNotNull(result);
                         assertTrue(result.getChannels().contains("daughter"));
                         listingSuccess.set(true);
-                        // tag::ignore[]
+                        // end::ignore[]
                         if (!status.isError()) {
                             for (String channel : result.getChannels()) {
                                 Log.d("channel", channel);

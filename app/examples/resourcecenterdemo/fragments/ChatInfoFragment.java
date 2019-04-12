@@ -59,7 +59,7 @@ public class ChatInfoFragment extends ParentFragment {
     }
 
     @Override
-    public void setViewBehaviour() {
+    public void setViewBehaviour(boolean viewFromCache) {
         mUsersRecyclerView.setLayoutManager(new LinearLayoutManager(fragmentContext));
         mUsersRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mUserAdapter = new UserAdapter(mChannel, mUsers);

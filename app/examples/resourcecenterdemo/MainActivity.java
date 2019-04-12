@@ -6,15 +6,15 @@ import android.widget.FrameLayout;
 import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.enums.PNLogVerbosity;
+import com.pubnub.api.enums.PNReconnectionPolicy;
 
-import resourcecenterdemo.fragments.ChatFragment;
-import resourcecenterdemo.prefs.Prefs;
-import resourcecenterdemo.pubnub.PubNubListener;
-import resourcecenterdemo.util.ParentActivityImpl;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import butterknife.BindView;
+import resourcecenterdemo.fragments.ChatFragment;
+import resourcecenterdemo.prefs.Prefs;
+import resourcecenterdemo.util.ParentActivityImpl;
 
 public class MainActivity extends ParentActivity implements ParentActivityImpl {
 
@@ -25,15 +25,15 @@ public class MainActivity extends ParentActivity implements ParentActivityImpl {
     FrameLayout mFragmentContainer;
 
     private PubNub mPubNub;
-    private PubNubListener mPubNubListener;
+
+    final String historyChannel = "much_history";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setSupportActionBar(mToolbar);
         initializePubNub();
-        addFragment(ChatFragment.newInstance("demo-animal-chat"));
-        /*Log.d("sekure", BuildConfig.DB_FILEPATH);*/
+        addFragment(ChatFragment.newInstance("demo-animal-forest"));
     }
 
     @Override
@@ -47,6 +47,7 @@ public class MainActivity extends ParentActivity implements ParentActivityImpl {
         pnConfiguration.setSubscribeKey(BuildConfig.SUB_KEY);
         pnConfiguration.setUuid(Prefs.get().uuid());
         pnConfiguration.setLogVerbosity(PNLogVerbosity.BODY);
+        pnConfiguration.setReconnectionPolicy(PNReconnectionPolicy.LINEAR);
         mPubNub = new PubNub(pnConfiguration);
     }
 
@@ -77,6 +78,7 @@ public class MainActivity extends ParentActivity implements ParentActivityImpl {
     @Override
     protected void onDestroy() {
         getPubNub().unsubscribeAll();
+        getPubNub().forceDestroy();
         super.onDestroy();
     }
 }
