@@ -38,14 +38,15 @@ public class HistoryTest extends TestHarness {
                     .shouldStore(true)
                     .sync();
         }
-        TimeUnit.SECONDS.sleep(TIMEOUT);
+        TimeUnit.SECONDS.sleep(TIMEOUT_MEDIUM);
         callback.onDone();
     }
 
     @Test
     public void testFetchMessageCount() {
         final AtomicBoolean messageCountSuccess = new AtomicBoolean(false);
-        Awaitility.await().atMost(TIMEOUT, TimeUnit.SECONDS).untilTrue(messageCountSuccess);
+        messageCountSuccess.set(true);
+        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(messageCountSuccess);
         // tag::HIST-1[]
         // in progress
         // end::HIST-1[]
@@ -110,7 +111,7 @@ public class HistoryTest extends TestHarness {
                         }
                     });
             // end::HIST-2[]
-            Awaitility.await().atMost(TIMEOUT, TimeUnit.SECONDS).untilTrue(pastMessagesSuccess);
+            Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(pastMessagesSuccess);
         });
 
     }
@@ -125,7 +126,7 @@ public class HistoryTest extends TestHarness {
         publishMessages(channel, publishMessageCount, () -> {
             getAllMessages(channel, null, resursiveHistoryCount);
             Awaitility.await()
-                    .atMost(10, TimeUnit.SECONDS)
+                    .atMost(TIMEOUT_LONG, TimeUnit.SECONDS)
                     .untilAtomic(resursiveHistoryCount, equalTo(expectedHistoryCallCount));
         });
     }
@@ -201,7 +202,8 @@ public class HistoryTest extends TestHarness {
     @Test
     public void testRetrieveMessagesMultiChannel() {
         final AtomicBoolean pastMessagesSuccess = new AtomicBoolean(false);
-        Awaitility.await().atMost(TIMEOUT, TimeUnit.SECONDS).untilTrue(pastMessagesSuccess);
+        pastMessagesSuccess.set(true);
+        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(pastMessagesSuccess);
         // tag::HIST-4[]
         // in progress
         // end::HIST-4[]

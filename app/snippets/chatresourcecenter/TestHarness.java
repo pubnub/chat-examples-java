@@ -16,7 +16,9 @@ abstract class TestHarness {
     static final String SUB_KEY = BuildConfig.SUB_KEY;
     static final String PUB_KEY = BuildConfig.PUB_KEY;
 
-    static final int TIMEOUT = 5;
+    static final int TIMEOUT_SHORT = 2;
+    static final int TIMEOUT_MEDIUM = 5;
+    static final int TIMEOUT_LONG = 10;
 
     @Before
     public void before() {

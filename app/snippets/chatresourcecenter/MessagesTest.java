@@ -53,7 +53,7 @@ public class MessagesTest extends TestHarness {
                     }
                 });
         // end::MSG-1[]
-        Awaitility.await().atMost(TIMEOUT, TimeUnit.SECONDS).untilTrue(messageSendSuccess);
+        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(messageSendSuccess);
     }
 
     @Test
@@ -119,7 +119,7 @@ public class MessagesTest extends TestHarness {
                 .channels(Arrays.asList("room-1"))
                 .execute();
 
-        Awaitility.await().atMost(TIMEOUT, TimeUnit.SECONDS).untilTrue(messageReceivedSuccess);
+        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(messageReceivedSuccess);
 
     }
 
@@ -151,7 +151,7 @@ public class MessagesTest extends TestHarness {
                     }
                 });
         // end::MSG-4[]
-        Awaitility.await().atMost(TIMEOUT, TimeUnit.SECONDS).untilTrue(typingIndicatorSendSuccess);
+        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(typingIndicatorSendSuccess);
     }
 
     @Test
@@ -207,7 +207,7 @@ public class MessagesTest extends TestHarness {
                 .channels(Arrays.asList("room-1"))
                 .execute();
 
-        Awaitility.await().atMost(TIMEOUT, TimeUnit.SECONDS).untilTrue(timestampShownSuccess);
+        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(timestampShownSuccess);
     }
 
 }

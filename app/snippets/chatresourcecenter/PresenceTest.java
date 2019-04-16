@@ -68,7 +68,7 @@ public class PresenceTest extends TestHarness {
                 .withPresence()
                 .execute();
         // end::PRE-1[]
-        Awaitility.await().atMost(TIMEOUT, TimeUnit.SECONDS).untilTrue(presenceEventReceivedSuccess);
+        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(presenceEventReceivedSuccess);
     }
 
     @Test
@@ -148,13 +148,13 @@ public class PresenceTest extends TestHarness {
                 .withPresence()
                 .execute();
 
-        Awaitility.await().atMost(TIMEOUT, TimeUnit.SECONDS).untilTrue(presenceStatusReceivedSuccess);
+        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(presenceStatusReceivedSuccess);
     }
 
     @Test
     public void testLastOnlineTimestamp() {
         final AtomicBoolean lastOnlineTimestampSuccess = new AtomicBoolean(true);
-        Awaitility.await().atMost(TIMEOUT, TimeUnit.SECONDS).untilTrue(lastOnlineTimestampSuccess);
+        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(lastOnlineTimestampSuccess);
         // tag::PRE-3[]
         // in progress
         // end::PRE-3[]

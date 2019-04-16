@@ -70,7 +70,7 @@ public class ManageChannelsTest extends TestHarness {
                 .withPresence()
                 .execute();
 
-        Awaitility.await().atMost(TIMEOUT, TimeUnit.SECONDS).untilTrue(joinSuccess);
+        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(joinSuccess);
     }
 
     @Test
@@ -81,7 +81,7 @@ public class ManageChannelsTest extends TestHarness {
                 .execute();
         // end::CHAN-2[]
 
-        TimeUnit.SECONDS.sleep(TIMEOUT);
+        TimeUnit.SECONDS.sleep(TIMEOUT_MEDIUM);
 
         PNHereNowResult hereNowResult = pubNub.hereNow()
                 .channels(Arrays.asList("room-1", "room-2", "room-3"))
@@ -147,7 +147,7 @@ public class ManageChannelsTest extends TestHarness {
                 .channels(Arrays.asList("room-1"))
                 .execute();
 
-        Awaitility.await().atMost(TIMEOUT, TimeUnit.SECONDS).untilTrue(leaveSuccess);
+        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(leaveSuccess);
     }
 
     @Test
@@ -178,7 +178,7 @@ public class ManageChannelsTest extends TestHarness {
                 .execute();
         // end::CHAN-4[]
 
-        Awaitility.await().atMost(TIMEOUT, TimeUnit.SECONDS).untilTrue(joinSuccess);
+        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(joinSuccess);
     }
 
     @Test
@@ -211,7 +211,7 @@ public class ManageChannelsTest extends TestHarness {
                     }
                 });
         // end::CHAN-5[]
-        Awaitility.await().atMost(TIMEOUT, TimeUnit.SECONDS).untilTrue(addSuccess);
+        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(addSuccess);
     }
 
     @Test
@@ -245,7 +245,7 @@ public class ManageChannelsTest extends TestHarness {
                 });
         // end::CHAN-6[]
 
-        Awaitility.await().atMost(TIMEOUT, TimeUnit.SECONDS).untilTrue(leaveSuccess);
+        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(leaveSuccess);
     }
 
     @Test
@@ -276,7 +276,7 @@ public class ManageChannelsTest extends TestHarness {
                 });
         // end::CHAN-7[]
 
-        Awaitility.await().atMost(TIMEOUT, TimeUnit.SECONDS).untilTrue(listingSuccess);
+        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(listingSuccess);
     }
 
     @Test
@@ -312,7 +312,7 @@ public class ManageChannelsTest extends TestHarness {
                 .channelGroups(Arrays.asList("family"))
                 .execute();
 
-        Awaitility.await().atMost(TIMEOUT, TimeUnit.SECONDS).untilTrue(leaveSuccess);
+        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(leaveSuccess);
     }
 
     private PNChannelGroupsAllChannelsResult getChannelsForChannelGroup(String channelGroup) throws PubNubException {

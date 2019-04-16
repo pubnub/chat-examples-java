@@ -93,7 +93,7 @@ public class ConnectToPubNubTest extends TestHarness {
                     }
                 });
         // end::CON-4[]
-        Awaitility.await().atMost(TIMEOUT, TimeUnit.SECONDS).untilTrue(setStateSuccess);
+        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(setStateSuccess);
 
         final AtomicBoolean getStateSuccess = new AtomicBoolean(false);
         // tag::CON-5[]
@@ -119,7 +119,7 @@ public class ConnectToPubNubTest extends TestHarness {
                 });
         // end::CON-5[]
 
-        Awaitility.await().atMost(TIMEOUT, TimeUnit.SECONDS).untilTrue(getStateSuccess);
+        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(getStateSuccess);
     }
 
     @Test
@@ -160,7 +160,7 @@ public class ConnectToPubNubTest extends TestHarness {
                     pubNub.unsubscribeAll();
                     // tag::ignore[]
                     try {
-                        TimeUnit.SECONDS.sleep(TIMEOUT);
+                        TimeUnit.SECONDS.sleep(TIMEOUT_MEDIUM);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -186,7 +186,7 @@ public class ConnectToPubNubTest extends TestHarness {
                 .withPresence()
                 .execute();
 
-        Awaitility.await().atMost(TIMEOUT, TimeUnit.SECONDS).untilTrue(unsubscribedSuccess);
+        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(unsubscribedSuccess);
     }
 
     @Test
