@@ -26,6 +26,7 @@ public class MainActivity extends ParentActivity implements ParentActivityImpl {
 
     private PubNub mPubNub;
 
+    final String channel = "demo-animal-forest";
     final String historyChannel = "much_history";
 
     @Override
@@ -33,7 +34,7 @@ public class MainActivity extends ParentActivity implements ParentActivityImpl {
         super.onCreate(savedInstanceState);
         setSupportActionBar(mToolbar);
         initializePubNub();
-        addFragment(ChatFragment.newInstance("demo-animal-forest"));
+        addFragment(ChatFragment.newInstance(historyChannel));
     }
 
     @Override
