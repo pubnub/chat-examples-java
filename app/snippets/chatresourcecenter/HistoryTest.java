@@ -3,14 +3,18 @@ package chatresourcecenter;
 import com.pubnub.api.PubNubException;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.models.consumer.PNStatus;
+import com.pubnub.api.models.consumer.history.PNFetchMessagesResult;
 import com.pubnub.api.models.consumer.history.PNHistoryItemResult;
 import com.pubnub.api.models.consumer.history.PNHistoryResult;
+import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
 
 import org.awaitility.Awaitility;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -22,6 +26,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class HistoryTest extends TestHarness {
 
@@ -30,7 +35,8 @@ public class HistoryTest extends TestHarness {
         void onDone();
     }
 
-    void publishMessages(String channel, int count, Callback callback) throws PubNubException, InterruptedException {
+    private void publishMessages(String channel, int count, Callback callback) throws PubNubException,
+            InterruptedException {
         for (int i = 0; i < count; i++) {
             pubNub.publish()
                     .channel(channel)
@@ -38,7 +44,7 @@ public class HistoryTest extends TestHarness {
                     .shouldStore(true)
                     .sync();
         }
-        TimeUnit.SECONDS.sleep(TIMEOUT_MEDIUM);
+        TimeUnit.SECONDS.sleep(TIMEOUT_SHORT);
         callback.onDone();
     }
 
@@ -99,9 +105,6 @@ public class HistoryTest extends TestHarness {
                         @Override
                         public void onResponse(PNHistoryResult result, PNStatus status) {
                             // tag::ignore[]
-                            for (PNHistoryItemResult message : result.getMessages()) {
-                                System.out.println(message.getEntry());
-                            }
                             assertFalse(status.isError());
                             assertNotNull(result);
                             assertEquals(count, result.getMessages().size());
@@ -169,9 +172,9 @@ public class HistoryTest extends TestHarness {
 
                             // if 'messages' were retrieved, do something useful with them
                             if (messages != null && !messages.isEmpty()) {
-                                Log.d("messages", String.valueOf(messages.size()));
-                                Log.d("messages", "start: " + start);
-                                Log.d("messages", "end: " + end);
+                                Log.i("messages", String.valueOf(messages.size()));
+                                Log.i("messages", "start: " + start);
+                                Log.i("messages", "end: " + end);
                             }
 
                             /*
@@ -200,13 +203,80 @@ public class HistoryTest extends TestHarness {
     // end::HIST-3[]
 
     @Test
-    public void testRetrieveMessagesMultiChannel() {
+    public void testRetrieveMessagesMultiChannel() throws PubNubException, InterruptedException {
         final AtomicBoolean pastMessagesSuccess = new AtomicBoolean(false);
-        pastMessagesSuccess.set(true);
-        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(pastMessagesSuccess);
+
+        Calendar cal = Calendar.getInstance();
+        long start = cal.getTimeInMillis() * 10_000L;
+        start--;
+
+        final int channelsCount = 3;
+        final int messagesCount = 8;
+        List<String> channels = new ArrayList<>(channelsCount);
+        for (int i = 0; i < channelsCount; i++) {
+            channels.add(UUID.randomUUID().toString());
+            publishMessages(channels.get(i), messagesCount, () -> {
+
+            });
+        }
+
+        long end = Calendar.getInstance().getTimeInMillis() * 10_000L;
+
         // tag::HIST-4[]
-        // in progress
+        pubNub.fetchMessages()
+                // tag::ignore[]
+                .channels(channels)
+                // end::ignore[]
+                // tag::ignore[]
+                /*
+                // end::ignore[]
+                .channels(Arrays.asList("ch1", "ch2", "ch3"))
+                // tag::ignore[]
+                */
+                // end::ignore[]
+                // tag::ignore[]
+                .start(start)
+                .end(end)
+                // end::ignore[]
+                // tag::ignore[]
+                /*
+                // end::ignore[]
+                .start(15343325214676133L)
+                .end(15343325004275466L)
+                // tag::ignore[]
+                */
+                // end::ignore[]
+                .maximumPerChannel(15)
+                .async(new PNCallback<PNFetchMessagesResult>() {
+                    @Override
+                    public void onResponse(PNFetchMessagesResult result, PNStatus status) {
+                        // tag::ignore[]
+                        assertFalse(status.isError());
+                        assertNotNull(result);
+                        assertEquals(channelsCount, result.getChannels().entrySet().size());
+                        for (Map.Entry<String, List<PNMessageResult>> entry : result.getChannels().entrySet()) {
+                            assertTrue(channels.contains(entry.getKey()));
+                            assertEquals(messagesCount, entry.getValue().size());
+                            for (PNMessageResult pnMessageResult : entry.getValue()) {
+                                assertTrue(channels.contains(pnMessageResult.getChannel()));
+                            }
+                        }
+
+                        pastMessagesSuccess.set(true);
+                        // end::ignore[]
+                        if (!status.isError()) {
+                            for (Map.Entry<String, List<PNMessageResult>> entry : result.getChannels().entrySet()) {
+                                Log.i("batch_history", "Channel: " + entry.getKey());
+                                for (PNMessageResult message : entry.getValue()) {
+                                    Log.i("batch_history", "\tMessage: " + message.getMessage());
+                                }
+                                Log.i("batch_history", "-----\n");
+                            }
+                        }
+                    }
+                });
         // end::HIST-4[]
+        Awaitility.await().atMost(TIMEOUT_LONG, TimeUnit.SECONDS).untilTrue(pastMessagesSuccess);
     }
 
 }
