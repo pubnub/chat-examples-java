@@ -1,10 +1,12 @@
 package resourcecenterdemo.model;
 
+import android.content.res.TypedArray;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import resourcecenterdemo.util.Helper;
-import okhttp3.HttpUrl;
+import resourcecenterdemo.App;
+import resourcecenterdemo.R;
 
 public class Users {
 
@@ -16,6 +18,29 @@ public class Users {
     static {
         users = new ArrayList<>();
 
+        // addData();
+
+        addRichData();
+    }
+
+    private static void addRichData() {
+        String[] firstNames = App.get().getResources().getStringArray(R.array.first_names);
+        String[] lastNames = App.get().getResources().getStringArray(R.array.last_names);
+        TypedArray images = App.get().getResources().obtainTypedArray(R.array.images);
+
+        for (int i = 0; i < firstNames.length; i++) {
+            users.add(User.newBuilder()
+                    .firstName(firstNames[i])
+                    .lastName(lastNames[i])
+                    .profilePictureUrl(images.getResourceId(i, 0))
+                    .uuid("u-0000" + i)
+                    .build());
+        }
+
+        images.recycle();
+    }
+
+    private static void addData() {
         users.add(User.newBuilder()
                 .firstName("Finny")
                 .lastName("Fish")
@@ -63,7 +88,6 @@ public class Users {
                 .lastName("Lion")
                 .uuid("u-00007")
                 .build());
-
     }
 
     public static List<User> all() {
@@ -80,26 +104,16 @@ public class Users {
 
     public static class User {
 
-        private String firstName, lastName, uuid, profilePictureUrl;
+        private String firstName, lastName, uuid;
         private String displayName;
+        private Integer profilePictureUrl;
 
         private User(Builder builder) {
             firstName = builder.firstName;
             lastName = builder.lastName;
             uuid = builder.uuid;
             profilePictureUrl = builder.profilePictureUrl;
-            displayName = firstName + " the " + lastName;
-            if (profilePictureUrl == null) {
-                String hash = Helper.md5(uuid);
-                profilePictureUrl = new HttpUrl.Builder()
-                        .scheme("https")
-                        .host("gravatar.com")
-                        .addPathSegment("avatar")
-                        .addPathSegment(hash)
-                        .addQueryParameter("s", "400")
-                        .addQueryParameter("d", "identicon")
-                        .build().toString();
-            }
+            displayName = firstName + " " + lastName;
         }
 
         static Builder newBuilder() {
@@ -111,7 +125,7 @@ public class Users {
             private String firstName;
             private String lastName;
             private String uuid;
-            private String profilePictureUrl;
+            private Integer profilePictureUrl;
 
             private Builder() {
             }
@@ -131,7 +145,7 @@ public class Users {
                 return this;
             }
 
-            public Builder profilePictureUrl(String profilePictureUrl) {
+            public Builder profilePictureUrl(Integer profilePictureUrl) {
                 this.profilePictureUrl = profilePictureUrl;
                 return this;
             }
@@ -153,7 +167,7 @@ public class Users {
             return uuid;
         }
 
-        public String getProfilePictureUrl() {
+        public Integer getProfilePictureUrl() {
             return profilePictureUrl;
         }
 
