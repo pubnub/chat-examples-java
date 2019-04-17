@@ -210,8 +210,8 @@ public class HistoryTest extends TestHarness {
         long start = cal.getTimeInMillis() * 10_000L;
         start--;
 
-        final int channelsCount = 3;
-        final int messagesCount = 8;
+        final int channelsCount = 2;
+        final int messagesCount = 2;
         List<String> channels = new ArrayList<>(channelsCount);
         for (int i = 0; i < channelsCount; i++) {
             channels.add(UUID.randomUUID().toString());
