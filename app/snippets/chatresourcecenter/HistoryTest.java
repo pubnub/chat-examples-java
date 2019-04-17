@@ -132,9 +132,20 @@ public class HistoryTest extends TestHarness {
                     .atMost(TIMEOUT_LONG, TimeUnit.SECONDS)
                     .untilAtomic(resursiveHistoryCount, equalTo(expectedHistoryCallCount));
         });
+
+        // tag::HIST-3.2[]
+        // tag::ignore[]
+        /*
+        // end::ignore[]
+        // Usage example:
+        getAllMessages(null);
+        // tag::ignore[]
+        */
+        // end::ignore[]
+        // end::HIST-3.2[]
     }
 
-    // tag::HIST-3[]
+    // tag::HIST-3.1[]
     // tag::ignore[]
     private void getAllMessages(String channel, Long startTimeToken, AtomicInteger historyCallCount) {
         // end::ignore[]
@@ -200,7 +211,7 @@ public class HistoryTest extends TestHarness {
                     }
                 });
     }
-    // end::HIST-3[]
+    // end::HIST-3.1[]
 
     @Test
     public void testRetrieveMessagesMultiChannel() throws PubNubException, InterruptedException {
