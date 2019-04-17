@@ -191,10 +191,25 @@ public class ConnectToPubNubTest extends TestHarness {
 
     @Test
     public void testReconnectingManually() {
-        // tag::CON-7[]
-        pubNub.getConfiguration().setReconnectionPolicy(PNReconnectionPolicy.LINEAR);
+        // tag::CON-7.1[]
+        PNConfiguration pnConfiguration = new PNConfiguration();
+        pnConfiguration.setSubscribeKey(SUB_KEY);
+        pnConfiguration.setPublishKey(PUB_KEY);
+        pnConfiguration.setReconnectionPolicy(PNReconnectionPolicy.LINEAR);
+
+        PubNub pubNub = new PubNub(pnConfiguration);
+        // end::CON-7.1[]
+
+        // tag::CON-7.2[]
+        /*
+         * If connection availability check will be done in other way,
+         * then use this  function to reconnect to PubNub.
+         */
         pubNub.reconnect();
-        // end::CON-7[]
+        // end::CON-7.2[]
+
+        assertNotNull(pubNub);
+        assertEquals(pubNub.getConfiguration().getReconnectionPolicy(), PNReconnectionPolicy.LINEAR);
     }
 
 }
