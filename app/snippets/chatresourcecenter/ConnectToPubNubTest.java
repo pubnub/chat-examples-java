@@ -158,14 +158,6 @@ public class ConnectToPubNubTest extends TestHarness {
                 if (status.getOperation() == PNOperationType.PNSubscribeOperation) {
                     // tag::CON-6[]
                     pubNub.unsubscribeAll();
-                    // tag::ignore[]
-                    try {
-                        TimeUnit.SECONDS.sleep(TIMEOUT_MEDIUM);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    // end::ignore[]
-                    pubNub.destroy();
                     // end::CON-6[]
                 }
             }
