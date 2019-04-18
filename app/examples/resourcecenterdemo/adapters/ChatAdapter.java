@@ -124,7 +124,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
                 .title(R.string.message_info)
                 .content(Html.fromHtml(contentBuilder.toString()))
                 .positiveText(android.R.string.ok)
-                .positiveColor(context.getResources().getColor(R.color.white))
                 .build();
         materialDialog.show();
     }

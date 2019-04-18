@@ -6,11 +6,12 @@ import resourcecenterdemo.util.Helper;
 
 public class Message {
 
-    String senderId, text, timestamp;
-    long timetoken;
-    boolean isOwnMessage;
+    String senderId, text;
+    transient String timestamp;
+    transient long timetoken;
+    transient boolean isOwnMessage;
 
-    Users.User user;
+    transient Users.User user;
 
     private Message(Builder builder) {
         senderId = builder.senderId;

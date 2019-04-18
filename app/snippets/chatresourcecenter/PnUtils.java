@@ -5,7 +5,9 @@ import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
 import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
 public class PnUtils {
@@ -68,5 +70,12 @@ public class PnUtils {
         logBuilder.append("Event: ").append(presence.getEvent()).append("\n");
         logBuilder.append("Channel: ").append(presence.getChannel()).append("\n");
         System.out.println(logBuilder.toString());
+    }
+
+    public static String parseTimetoken(long timetoken) {
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss dd MMM YYYY");
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timetoken / 10_000L);
+        return sdf.format(calendar.getTime());
     }
 }

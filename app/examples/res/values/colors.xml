@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">@color/apple_red</color>
+    <color name="colorPrimary">@color/alizarin_crimson</color>
     <color name="colorPrimaryDark">@color/monza</color>
     <color name="colorAccent">@color/black</color>
-    <color name="background">@color/cod_gray</color>
+    <color name="background">@color/white</color>
     <color name="divider">@color/bright_gray</color>
-    <color name="text">@color/white</color>
-    <color name="text_secondary">@color/pumice</color>
-    <color name="message_composer">@color/cinder</color>
+    <color name="text">@color/black</color>
+    <color name="text_secondary">@color/bright_gray</color>
+    <color name="message_composer">@color/white_smoke</color>
     <color name="message_bubble_sent">@color/colorPrimary</color>
-    <color name="message_bubble_received">@color/black</color>
+    <color name="message_bubble_received">@color/white_smoke</color>
+    <color name="message_metadata">@color/storm_dust</color>
+    <color name="message_sent_text">@color/white</color>
+    <color name="message_received_text">@color/black</color>
 </resources>

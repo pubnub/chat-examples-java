@@ -25,7 +25,7 @@
         android:layout_marginLeft="8dp"
         android:layout_toEndOf="@id/message_avatar"
         android:layout_toRightOf="@id/message_avatar"
-        android:textColor="@color/white"
+        android:textColor="@color/message_metadata"
         android:textSize="12sp"
         android:textStyle="bold"
         tools:text="Monty the monkey" />
@@ -38,7 +38,7 @@
         android:layout_marginLeft="2dp"
         android:layout_toEndOf="@id/message_sender"
         android:layout_toRightOf="@id/message_sender"
-        android:textColor="@color/white"
+        android:textColor="@color/message_metadata"
         android:textSize="12sp"
         tools:text="7:22 PM" />
 
@@ -53,6 +53,7 @@
         android:layout_toRightOf="@id/message_avatar"
         android:background="@drawable/message_received_bubble"
         android:padding="8dp"
+        android:textColor="@color/message_received_text"
         tools:text="@string/lorem_ipsum_long" />
 
 </RelativeLayout>

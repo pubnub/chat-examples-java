@@ -93,7 +93,7 @@ public class ConnectToPubNubTest extends TestHarness {
                     }
                 });
         // end::CON-4[]
-        Awaitility.await().atMost(TIMEOUT, TimeUnit.SECONDS).untilTrue(setStateSuccess);
+        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(setStateSuccess);
 
         final AtomicBoolean getStateSuccess = new AtomicBoolean(false);
         // tag::CON-5[]
@@ -119,7 +119,7 @@ public class ConnectToPubNubTest extends TestHarness {
                 });
         // end::CON-5[]
 
-        Awaitility.await().atMost(TIMEOUT, TimeUnit.SECONDS).untilTrue(getStateSuccess);
+        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(getStateSuccess);
     }
 
     @Test
@@ -158,14 +158,6 @@ public class ConnectToPubNubTest extends TestHarness {
                 if (status.getOperation() == PNOperationType.PNSubscribeOperation) {
                     // tag::CON-6[]
                     pubNub.unsubscribeAll();
-                    // tag::ignore[]
-                    try {
-                        TimeUnit.SECONDS.sleep(TIMEOUT);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    // end::ignore[]
-                    pubNub.destroy();
                     // end::CON-6[]
                 }
             }
@@ -186,15 +178,30 @@ public class ConnectToPubNubTest extends TestHarness {
                 .withPresence()
                 .execute();
 
-        Awaitility.await().atMost(TIMEOUT, TimeUnit.SECONDS).untilTrue(unsubscribedSuccess);
+        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(unsubscribedSuccess);
     }
 
     @Test
     public void testReconnectingManually() {
-        // tag::CON-7[]
-        pubNub.getConfiguration().setReconnectionPolicy(PNReconnectionPolicy.LINEAR);
+        // tag::CON-7.1[]
+        PNConfiguration pnConfiguration = new PNConfiguration();
+        pnConfiguration.setSubscribeKey(SUB_KEY);
+        pnConfiguration.setPublishKey(PUB_KEY);
+        pnConfiguration.setReconnectionPolicy(PNReconnectionPolicy.LINEAR);
+
+        PubNub pubNub = new PubNub(pnConfiguration);
+        // end::CON-7.1[]
+
+        // tag::CON-7.2[]
+        /*
+         * If connection availability check will be done in other way,
+         * then use this  function to reconnect to PubNub.
+         */
         pubNub.reconnect();
-        // end::CON-7[]
+        // end::CON-7.2[]
+
+        assertNotNull(pubNub);
+        assertEquals(pubNub.getConfiguration().getReconnectionPolicy(), PNReconnectionPolicy.LINEAR);
     }
 
 }
