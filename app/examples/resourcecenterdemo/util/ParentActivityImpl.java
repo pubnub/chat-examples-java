@@ -10,6 +10,8 @@ public interface ParentActivityImpl {
 
     void setTitle(String title);
 
+    void setSubtitle(String subtitle);
+
     void addFragment(Fragment fragment);
 
 }

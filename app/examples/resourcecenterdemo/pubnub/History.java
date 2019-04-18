@@ -1,6 +1,5 @@
 package resourcecenterdemo.pubnub;
 
-import com.google.gson.JsonObject;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.models.consumer.PNStatus;
@@ -31,14 +30,7 @@ public class History {
                             if (!status.isError() && !result.getMessages().isEmpty()) {
                                 List<Message> messages = new ArrayList<>();
                                 for (PNHistoryItemResult message : result.getMessages()) {
-                                    JsonObject entry = message.getEntry().getAsJsonObject();
-
-                                    Message msg = Message.newBuilder()
-                                            .text(entry.get("text").getAsString())
-                                            .senderId(entry.get("senderId").getAsString())
-                                            .timetoken(message.getTimetoken())
-                                            .build();
-
+                                    Message msg = Message.serialize(message);
                                     messages.add(msg);
                                 }
                                 callback.handleResponse(messages);

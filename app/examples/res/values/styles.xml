@@ -6,21 +6,24 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowBackground">@color/background</item>
         <item name="android:textColor">@color/text</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">@dimen/text_size</item>
         <item name="android:fontFamily">@font/montserrat</item>
+        <item name="toolbarStyle">@style/Toolbar</item>
     </style>
 
-    <style name="SplashTheme" parent="Theme.MaterialComponents.NoActionBar">
+    <style name="SplashTheme" parent="Theme.MaterialComponents.Light">
         <item name="android:windowBackground">@drawable/splash_bg</item>
         <item name="colorPrimaryDark">@color/background</item>
         <item name="android:navigationBarColor" tools:ignore="NewApi">@color/colorPrimaryDark</item>
         <item name="android:statusBarColor" tools:ignore="NewApi">@color/colorPrimaryDark</item>
     </style>
 
-    <style name="ToolBarStyle">
-        <item name="android:textColorPrimary">@color/white</item>
-        <item name="android:textColorSecondary">@color/white</item>
-        <item name="actionMenuTextColor">@color/white</item>
-        <item name="android:textStyle">bold</item>
+    <style name="MessageBubble">
+        <item name="android:paddingLeft">@dimen/default_spacing</item>
+        <item name="android:paddingRight">@dimen/default_spacing</item>
+        <item name="android:paddingStart">@dimen/default_spacing</item>
+        <item name="android:paddingEnd">@dimen/default_spacing</item>
+        <item name="android:paddingTop">@dimen/half_spacing</item>
+        <item name="android:paddingBottom">@dimen/half_spacing</item>
     </style>
 </resources>

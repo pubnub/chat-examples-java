@@ -99,7 +99,7 @@ public class Users {
             if (user.uuid.equals(id))
                 return user;
         }
-        return null;
+        return User.newBuilder().build();
     }
 
     public static class User {

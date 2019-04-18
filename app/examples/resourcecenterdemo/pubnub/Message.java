@@ -1,5 +1,11 @@
 package resourcecenterdemo.pubnub;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.pubnub.api.models.consumer.history.PNHistoryItemResult;
+import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
+
 import resourcecenterdemo.model.Users;
 import resourcecenterdemo.prefs.Prefs;
 import resourcecenterdemo.util.Helper;
@@ -7,33 +13,36 @@ import resourcecenterdemo.util.Helper;
 public class Message {
 
     String senderId, text;
+
     transient String timestamp;
     transient long timetoken;
     transient boolean isOwnMessage;
 
     transient Users.User user;
 
+    private Message() {
+
+    }
+
     private Message(Builder builder) {
-        senderId = builder.senderId;
+        senderId = Prefs.get().uuid();
         text = builder.text;
         timetoken = builder.timetoken;
-        isOwnMessage = senderId.equals(Prefs.get().uuid());
+        initializeCustomProperties();
+    }
+
+    private void initializeCustomProperties() {
+        isOwnMessage = Prefs.get().uuid().equals(senderId);
         timestamp = Helper.parseTime(timetoken / 10_000L);
         user = Users.getUserById(senderId);
     }
 
     public static final class Builder {
 
-        private String senderId;
         private String text;
         private long timetoken;
 
         private Builder() {
-        }
-
-        public Builder senderId(String senderId) {
-            this.senderId = senderId;
-            return this;
         }
 
         public Builder text(String text) {
@@ -53,6 +62,29 @@ public class Message {
 
     public static Builder newBuilder() {
         return new Builder();
+    }
+
+    public static Message serialize(PNHistoryItemResult pnHistoryItemResult) {
+        Message message = new Gson().fromJson(pnHistoryItemResult.getEntry(), Message.class);
+        message.timetoken = pnHistoryItemResult.getTimetoken();
+        message.initializeCustomProperties();
+        return message;
+    }
+
+    public static Message serialize(PNMessageResult pnMessageResult) {
+        Message message = new Gson().fromJson(pnMessageResult.getMessage(), Message.class);
+        message.timetoken = pnMessageResult.getTimetoken();
+        message.initializeCustomProperties();
+        return message;
+    }
+
+    public JsonObject generate() {
+        String json = new Gson().toJson(this);
+        JsonObject payload = new JsonParser().parse(json).getAsJsonObject();
+        if (timetoken != 0L) {
+            payload.addProperty("timetoken", timetoken);
+        }
+        return payload;
     }
 
     public String getSenderId() {
