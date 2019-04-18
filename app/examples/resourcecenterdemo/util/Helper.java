@@ -1,6 +1,7 @@
 package resourcecenterdemo.util;
 
 import android.annotation.SuppressLint;
+import android.text.format.DateUtils;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -59,5 +60,10 @@ public class Helper {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(timetoken);
         return sdf.format(calendar.getTime());
+    }
+
+    public static String getRelativeTime(long timetoken) {
+        return (String) DateUtils.getRelativeTimeSpanString(timetoken, Calendar.getInstance()
+                .getTimeInMillis(), 0L, DateUtils.FORMAT_ABBREV_ALL);
     }
 }

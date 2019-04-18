@@ -1,6 +1,8 @@
 package resourcecenterdemo.adapters;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +14,8 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.request.RequestOptions;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -33,7 +37,10 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
 
     private List<Message> mItems;
 
+    private Handler mainHandler;
+
     public ChatAdapter(String channel, List<Message> items) {
+        mainHandler = new Handler(Looper.getMainLooper());
         mChannel = channel;
         mItems = items;
     }
@@ -92,9 +99,27 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
 
         Message mMessage;
 
+        Timer mTimer;
+        TimerTask mTimerTask;
+
         MessageViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+
+            if (mTimer == null) {
+                mTimer = new Timer();
+            }
+
+            if (mTimerTask == null) {
+                mTimerTask = new TimerTask() {
+                    @Override
+                    public void run() {
+                        if (mMessage != null)
+                            mainHandler.post(() -> mTimestamp.setText(Helper.getRelativeTime(mMessage.getTimetoken() / 10_000L)));
+                    }
+                };
+                // mTimer.scheduleAtFixedRate(mTimerTask, 0, TimeUnit.SECONDS.toMillis(1));
+            }
         }
 
         void bindData(Message message) {
@@ -119,6 +144,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
         contentBuilder.append(AndroidUtils.newLine());
         contentBuilder.append(AndroidUtils.emphasizeText("Date time: "));
         contentBuilder.append(Helper.parseDateTime(message.getTimetoken() / 10_000L));
+        contentBuilder.append(AndroidUtils.newLine());
+        contentBuilder.append(AndroidUtils.emphasizeText("Relative: "));
+        contentBuilder.append(Helper.getRelativeTime(message.getTimetoken() / 10_000L));
 
         MaterialDialog materialDialog = new MaterialDialog.Builder(context)
                 .title(R.string.message_info)
@@ -127,6 +155,5 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
                 .build();
         materialDialog.show();
     }
-
 
 }

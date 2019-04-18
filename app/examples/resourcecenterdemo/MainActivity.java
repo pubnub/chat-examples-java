@@ -35,7 +35,7 @@ public class MainActivity extends ParentActivity implements ParentActivityImpl {
         super.onCreate(savedInstanceState);
         setSupportActionBar(mToolbar);
         initializePubNub();
-        addFragment(ChatFragment.newInstance(channel));
+        addFragment(ChatFragment.newInstance(historyChannel));
     }
 
     @Override
