@@ -27,13 +27,15 @@ public class Users {
         String[] firstNames = App.get().getResources().getStringArray(R.array.first_names);
         String[] lastNames = App.get().getResources().getStringArray(R.array.last_names);
         TypedArray images = App.get().getResources().obtainTypedArray(R.array.images);
+        String[] designations = App.get().getResources().getStringArray(R.array.designations);
 
         for (int i = 0; i < firstNames.length; i++) {
             users.add(User.newBuilder()
                     .firstName(firstNames[i])
                     .lastName(lastNames[i])
                     .profilePictureUrl(images.getResourceId(i, 0))
-                    .uuid("u-0000" + i)
+                    .designation(designations[i])
+                    .uuid("user-" + (i + 1))
                     .build());
         }
 
@@ -105,13 +107,14 @@ public class Users {
     public static class User {
 
         private String firstName, lastName, uuid;
-        private String displayName;
+        private String displayName, designation;
         private Integer profilePictureUrl;
 
         private User(Builder builder) {
             firstName = builder.firstName;
             lastName = builder.lastName;
             uuid = builder.uuid;
+            designation = builder.designation;
             profilePictureUrl = builder.profilePictureUrl;
             displayName = firstName + " " + lastName;
         }
@@ -120,12 +123,13 @@ public class Users {
             return new Builder();
         }
 
-        public static final class Builder {
+        static final class Builder {
 
             private String firstName;
             private String lastName;
             private String uuid;
             private Integer profilePictureUrl;
+            private String designation;
 
             private Builder() {
             }
@@ -145,8 +149,13 @@ public class Users {
                 return this;
             }
 
-            public Builder profilePictureUrl(Integer profilePictureUrl) {
+            Builder profilePictureUrl(Integer profilePictureUrl) {
                 this.profilePictureUrl = profilePictureUrl;
+                return this;
+            }
+
+            Builder designation(String designation) {
+                this.designation = designation;
                 return this;
             }
 
@@ -173,6 +182,10 @@ public class Users {
 
         public String getDisplayName() {
             return displayName;
+        }
+
+        public String getDesignation() {
+            return designation;
         }
     }
 
