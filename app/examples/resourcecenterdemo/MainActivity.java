@@ -29,13 +29,14 @@ public class MainActivity extends ParentActivity implements ParentActivityImpl {
 
     final String channel = "demo-animal-forest";
     final String historyChannel = "much_history";
+    final String spareChannel = "apr19mo";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setSupportActionBar(mToolbar);
         initializePubNub();
-        addFragment(ChatFragment.newInstance(historyChannel));
+        addFragment(ChatFragment.newInstance(channel));
     }
 
     @Override

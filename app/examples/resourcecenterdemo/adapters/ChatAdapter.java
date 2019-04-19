@@ -2,6 +2,7 @@ package resourcecenterdemo.adapters;
 
 import android.content.Context;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Looper;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -14,8 +15,6 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.request.RequestOptions;
 
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -37,12 +36,18 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
 
     private List<Message> mItems;
 
-    private Handler mainHandler;
+    private Handler uiHandler;
+    private HandlerThread mHandlerThread = new HandlerThread("mHandlerThread");
+
+    boolean useRelativeTimestamps = false;
 
     public ChatAdapter(String channel, List<Message> items) {
-        mainHandler = new Handler(Looper.getMainLooper());
+        uiHandler = new Handler(Looper.getMainLooper());
         mChannel = channel;
         mItems = items;
+        if (useRelativeTimestamps) {
+            mHandlerThread.start();
+        }
     }
 
     @Override
@@ -78,6 +83,23 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
         return mItems.size();
     }
 
+    @Override
+    public long getItemId(int position) {
+        return mItems.get(position).getTimetoken();
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(@NonNull MessageViewHolder holder) {
+        holder.stop();
+        super.onViewDetachedFromWindow(holder);
+    }
+
+    @Override
+    public void onViewAttachedToWindow(@NonNull MessageViewHolder holder) {
+        holder.start();
+        super.onViewAttachedToWindow(holder);
+    }
+
     class MessageViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.message_avatar)
@@ -99,26 +121,25 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
 
         Message mMessage;
 
-        Timer mTimer;
-        TimerTask mTimerTask;
+        private final Handler mBackgroundHandler;
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                updateTimestamp(Helper.getRelativeTime(mMessage.getTimetoken() / 10_000L));
+                mBackgroundHandler.postDelayed(this, 1000);
+            }
+        };
 
         MessageViewHolder(View itemView) {
             super(itemView);
+
             ButterKnife.bind(this, itemView);
 
-            if (mTimer == null) {
-                mTimer = new Timer();
-            }
-
-            if (mTimerTask == null) {
-                mTimerTask = new TimerTask() {
-                    @Override
-                    public void run() {
-                        if (mMessage != null)
-                            mainHandler.post(() -> mTimestamp.setText(Helper.getRelativeTime(mMessage.getTimetoken() / 10_000L)));
-                    }
-                };
-                // mTimer.scheduleAtFixedRate(mTimerTask, 0, TimeUnit.SECONDS.toMillis(1));
+            if (useRelativeTimestamps) {
+                mBackgroundHandler = new Handler(mHandlerThread.getLooper());
+            } else {
+                mBackgroundHandler = null;
             }
         }
 
@@ -127,12 +148,30 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
 
             mBubble.setText(mMessage.getText());
             mSender.setText(mMessage.getUser().getDisplayName());
-            mTimestamp.setText(mMessage.getTimestamp());
+            if (!useRelativeTimestamps) {
+                mTimestamp.setText(mMessage.getTimestamp());
+            }
 
             GlideApp.with(this.itemView)
                     .load(mMessage.getUser().getProfilePictureUrl())
                     .apply(RequestOptions.circleCropTransform())
                     .into(mAvatar);
+        }
+
+        private void updateTimestamp(String timestamp) {
+            uiHandler.post(() -> mTimestamp.setText(timestamp));
+        }
+
+        void stop() {
+            if (useRelativeTimestamps) {
+                mBackgroundHandler.removeCallbacks(runnable);
+            }
+        }
+
+        void start() {
+            if (useRelativeTimestamps) {
+                mBackgroundHandler.post(runnable);
+            }
         }
     }
 
