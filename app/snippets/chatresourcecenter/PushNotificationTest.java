@@ -53,7 +53,7 @@ public class PushNotificationTest extends TestHarness {
                 .async(new PNCallback<PNPushRemoveChannelResult>() {
                     @Override
                     public void onResponse(PNPushRemoveChannelResult result, PNStatus status) {
-                        
+                        // handle status, response
                     }
                 });
         // end::PUSH-2[]
