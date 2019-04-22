@@ -8,7 +8,6 @@ import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
 import com.pubnub.api.models.consumer.PNPublishResult;
 import com.pubnub.api.models.consumer.PNStatus;
-import com.pubnub.api.models.consumer.history.PNHistoryItemResult;
 import com.pubnub.api.models.consumer.history.PNHistoryResult;
 import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
 import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
@@ -231,7 +230,7 @@ public class MessagesTest extends TestHarness {
 
         Long initialTimeToken;
 
-        {
+        /*{
             JsonObject messagePayload = new JsonObject();
             messagePayload.addProperty("senderId", "user123");
             messagePayload.addProperty("text", "Hello, hoomans!");
@@ -268,7 +267,7 @@ public class MessagesTest extends TestHarness {
             for (PNHistoryItemResult message : history.getMessages()) {
                 System.out.println(message.getTimetoken() + ": " + message.getEntry());
             }
-        }
+        }*/
 
         Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(messageUpdatedSuccess);
     }
