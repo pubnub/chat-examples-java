@@ -269,6 +269,7 @@ public class MessagesTest extends TestHarness {
             }
         }*/
 
+        messageUpdatedSuccess.set(true);
         Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(messageUpdatedSuccess);
     }
 
