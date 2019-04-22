@@ -60,6 +60,8 @@ public class PnUtils {
         StringBuilder logBuilder = new StringBuilder("");
         logBuilder.append("Channel: ").append(message.getChannel()).append("\n");
         logBuilder.append("Subscription: ").append(message.getSubscription()).append("\n");
+        logBuilder.append("Publisher: ").append(message.getPublisher()).append("\n");
+        logBuilder.append("Content: ").append(message.getMessage()).append("\n");
         System.out.println(logBuilder.toString());
 
     }
