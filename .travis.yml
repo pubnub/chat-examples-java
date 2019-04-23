@@ -45,6 +45,10 @@ before_script:
   - echo "machine github.com login ${GH_NAME} password ${GH_TOKEN}"  > ~/.netrc
 
 script:
+  - echo PATH = ${PATH}
+  - echo JAVA_HOME = ${JAVA_HOME}
+  - ls ${JAVA_HOME}
+  - java -version
   - ./gradlew clean check
 
 after_success:
