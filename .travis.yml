@@ -6,7 +6,6 @@ addons:
   apt:
     packages:
       - oracle-java8-installer
-      - oracle-java9-installer
 jdk:
   - oraclejdk11
   - oraclejdk9
