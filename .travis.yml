@@ -1,3 +1,4 @@
+dist: precise
 language: android
 sudo: required
 
@@ -19,6 +20,12 @@ android:
     - android-28
     - extra-google-m2repository
     - extra-android-m2repository
+
+stages:
+  - examples
+  - snippets
+  - name: submodule
+    if: branch = master AND (type IN (api, cron, push))
 
 matrix:
   include: 
