@@ -30,51 +30,35 @@ stages:
   - name: submodule
     if: branch = master AND (type IN (api, cron, push))
 
-jobs:
-  include:
-    - stage: examples
-      name: "Integration tests"
-      before_install:
-        - chmod +x gradlew
-        - echo PUB_KEY="\"${PUB_KEY}\"" >> gradle.properties
-        - echo SUB_KEY="\"${SUB_KEY}\"" >> gradle.properties
-        - cat gradle.properties
-        - curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
-        - sudo apt-get install nodejs
-        - sudo apt-get install build-essential     
-      install: true
-      script:    
-        - echo PATH = ${PATH}
-        - echo JAVA_HOME = ${JAVA_HOME}
-        - ls ${JAVA_HOME}
-        - java -version
-        - ./gradlew clean check
-        
-    - stage: snippets
-      name: "Integration tests"
-      before_install:
-        - chmod +x gradlew
-        - echo PUB_KEY="\"${PUB_KEY}\"" >> gradle.properties
-        - echo SUB_KEY="\"${SUB_KEY}\"" >> gradle.properties
-        - cat gradle.properties
-        - curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
-        - sudo apt-get install nodejs
-        - sudo apt-get install build-essential 
-      install: true
-      script:    
-        - echo PATH = ${PATH}
-        - echo JAVA_HOME = ${JAVA_HOME}
-        - ls ${JAVA_HOME}
-        - java -version
-        - ./gradlew clean check    
-        
-    - stage: submodule
-      name: "Update reference"
-      install: 
-        - npm config set strict-ssl false
-        - npm install chalk fancy-log simple-git
-      before_script:
-        - git config --global user.name "${GH_NAME}"
-        - git config --global user.email "${GH_EMAIL}"
-        - echo "machine github.com login ${GH_NAME} password ${GH_TOKEN}"  > ~/.netrc
-      script: node .travis.docs.js
+matrix:
+  include: 
+
+before_install:
+  - chmod +x gradlew
+  - echo PUB_KEY="\"${PUB_KEY}\"" >> gradle.properties
+  - echo SUB_KEY="\"${SUB_KEY}\"" >> gradle.properties
+  - cat gradle.properties
+  - curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
+  - sudo apt-get install nodejs
+  - sudo apt-get install build-essential
+
+install:
+  - npm config set strict-ssl false
+  - npm install chalk fancy-log simple-git
+
+before_script:
+  - git config --global user.name "${GH_NAME}"
+  - git config --global user.email "${GH_EMAIL}"
+  - echo "machine github.com login ${GH_NAME} password ${GH_TOKEN}"  > ~/.netrc
+
+script:
+  - echo PATH = ${PATH}
+  - echo JAVA_HOME = ${JAVA_HOME}
+  - ls ${JAVA_HOME}
+  - java -version
+  - ./gradlew clean check
+
+after_success:
+  - node .travis.docs.js
+  
+after_failure: true
