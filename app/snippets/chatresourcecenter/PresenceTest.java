@@ -75,7 +75,7 @@ public class PresenceTest extends TestHarness {
         final AtomicBoolean presenceStatusReceivedSuccess = new AtomicBoolean(false);
 
         String expectedChannel = randomUuid();
-        
+
         pubNub.addListener(new SubscribeCallback() {
             @Override
             public void status(PubNub pubnub, PNStatus status) {

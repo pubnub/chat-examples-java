@@ -58,10 +58,8 @@ abstract class TestHarness {
         return pubNub.getConfiguration().getUuid();
     }
 
-    String randomUuid(){
+    String randomUuid() {
         return UUID.randomUUID().toString();
     }
-
-
 
 }
