@@ -8,6 +8,8 @@ addons:
 
 jdk:
   - oraclejdk8
+  - oraclejdk9
+  - openjdk8
 
 android:
   components:
