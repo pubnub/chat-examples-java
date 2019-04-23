@@ -3,6 +3,8 @@ package chatresourcecenter;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.pubnub.api.PubNub;
+import com.pubnub.api.PubNubException;
+import com.pubnub.api.PubNubUtil;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
 import com.pubnub.api.models.consumer.PNPublishResult;
@@ -16,7 +18,6 @@ import org.junit.Test;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -125,11 +126,30 @@ public class MessagesTest extends TestHarness {
 
     }
 
+    // tag::MSG-3[]
+    // Calculating a PubNub Message Payload Size
+    private int payloadSize(String channel, Object message) throws PubNubException {
+        String encodedPayload = PubNubUtil.urlEncode(channel + "/" + pubNub.getMapper().toJson(message));
+        System.out.println(encodedPayload);
+        return encodedPayload.length() + 150; // 150 is length of publish API prefix.
+    }
+    // end::MSG-3[]
+
     @Test
-    public void testSendImagesAndFiles() {
+    public void testSendImagesAndFiles() throws PubNubException {
         // tag::MSG-3[]
-        // in progress
+        // usage example
+        final String channel = "room-1";
+
+        JsonObject messagePayload = new JsonObject();
+        messagePayload.addProperty("senderId", "user123");
+        messagePayload.addProperty("text", "Hello World");
+
+        int size = payloadSize(channel, messagePayload);
+
+        Log.i("payload_size", String.valueOf(size));
         // end::MSG-3[]
+        assertEquals(230, size);
     }
 
     @Test
@@ -217,8 +237,8 @@ public class MessagesTest extends TestHarness {
     public void testUpdatingMessages() {
         final AtomicBoolean messageUpdatedSuccess = new AtomicBoolean(false);
 
-        final String expectedChannel = UUID.randomUUID().toString();
-        final String expectedText = UUID.randomUUID().toString();
+        final String expectedChannel = randomUuid();
+        final String expectedText = randomUuid();
         final AtomicLong initialTimetoken = new AtomicLong(0);
 
         pubNub.addListener(new SubscribeCallback() {
@@ -354,8 +374,8 @@ public class MessagesTest extends TestHarness {
     public void testSendingAnnouncements() {
         final AtomicBoolean announcementSentSuccess = new AtomicBoolean(false);
 
-        final String expectedChannel = UUID.randomUUID().toString();
-        final String expectedText = UUID.randomUUID().toString();
+        final String expectedChannel = randomUuid();
+        final String expectedText = randomUuid();
 
         observerClient.addListener(new SubscribeCallback() {
             @Override
