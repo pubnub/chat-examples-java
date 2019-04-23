@@ -52,7 +52,6 @@ jobs:
         
     - stage: snippets
       name: "Integration tests"
-      env: LANE='lint_and_test_snippets' SOURCE_DIR='Snippets'
       before_install:
         - chmod +x gradlew
         - echo PUB_KEY="\"${PUB_KEY}\"" >> gradle.properties
@@ -79,6 +78,3 @@ jobs:
         - git config --global user.email "${GH_EMAIL}"
         - echo "machine github.com login ${GH_NAME} password ${GH_TOKEN}"  > ~/.netrc
       script: node .travis.docs.js
-  
-install: true
-script: true
