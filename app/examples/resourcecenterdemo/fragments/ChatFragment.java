@@ -13,10 +13,12 @@ import com.pubnub.api.callbacks.SubscribeCallback;
 import com.pubnub.api.enums.PNOperationType;
 import com.pubnub.api.models.consumer.PNPublishResult;
 import com.pubnub.api.models.consumer.PNStatus;
+import com.pubnub.api.models.consumer.presence.PNHereNowResult;
 import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
 import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -30,7 +32,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import butterknife.BindView;
 import resourcecenterdemo.R;
 import resourcecenterdemo.adapters.ChatAdapter;
-import resourcecenterdemo.prefs.Prefs;
 import resourcecenterdemo.pubnub.History;
 import resourcecenterdemo.pubnub.Message;
 import resourcecenterdemo.view.MessageComposer;
@@ -144,6 +145,7 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
     @Override
     public String setScreenTitle() {
         scrollChatToBottom();
+        loadCurrentOccupancy();
         return mChannel;
     }
 
@@ -171,23 +173,36 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
             @Override
             public void message(PubNub pubnub, PNMessageResult message) {
                 handleNewMessage(message);
-
             }
 
             @Override
             public void presence(PubNub pubnub, PNPresenceEventResult presence) {
-
+                if (presence.getChannel().equals(mChannel)) {
+                    runOnUiThread(() -> hostActivity.setSubtitle(fragmentContext.getResources()
+                            .getString(R.string.members_online, presence.getOccupancy())));
+                }
             }
         };
     }
 
+    private void loadCurrentOccupancy() {
+        hostActivity.getPubNub()
+                .hereNow()
+                .channels(Arrays.asList(mChannel))
+                .async(new PNCallback<PNHereNowResult>() {
+                    @Override
+                    public void onResponse(PNHereNowResult result, PNStatus status) {
+                        if (!status.isError()) {
+                            hostActivity.setSubtitle(fragmentContext.getResources()
+                                    .getString(R.string.members_online, result.getTotalOccupancy()));
+                        }
+                    }
+                });
+    }
+
     private void handleNewMessage(PNMessageResult message) {
         if (message.getChannel().equals(mChannel)) {
-            Message msg = Message.newBuilder()
-                    .senderId(message.getMessage().getAsJsonObject().get("senderId").getAsString())
-                    .text(message.getMessage().getAsJsonObject().get("text").getAsString())
-                    .timetoken(message.getTimetoken())
-                    .build();
+            Message msg = Message.serialize(message);
             mMessages.add(msg);
             runOnUiThread(() -> {
                 mChatAdapter.notifyItemInserted(mChatAdapter.getItemCount());
@@ -251,7 +266,7 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
                 .publish()
                 .channel(mChannel)
                 .shouldStore(true)
-                .message(Message.newBuilder().senderId(Prefs.get().uuid()).text(message).build())
+                .message(Message.newBuilder().text(message).build().generate())
                 .async(new PNCallback<PNPublishResult>() {
                     @Override
                     public void onResponse(PNPublishResult result, PNStatus status) {

@@ -1,6 +1,9 @@
 package resourcecenterdemo.adapters;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,9 +36,18 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
 
     private List<Message> mItems;
 
+    private Handler uiHandler;
+    private HandlerThread mHandlerThread = new HandlerThread("mHandlerThread");
+
+    boolean useRelativeTimestamps = false;
+
     public ChatAdapter(String channel, List<Message> items) {
+        uiHandler = new Handler(Looper.getMainLooper());
         mChannel = channel;
         mItems = items;
+        if (useRelativeTimestamps) {
+            mHandlerThread.start();
+        }
     }
 
     @Override
@@ -71,6 +83,23 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
         return mItems.size();
     }
 
+    @Override
+    public long getItemId(int position) {
+        return mItems.get(position).getTimetoken();
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(@NonNull MessageViewHolder holder) {
+        holder.stop();
+        super.onViewDetachedFromWindow(holder);
+    }
+
+    @Override
+    public void onViewAttachedToWindow(@NonNull MessageViewHolder holder) {
+        holder.start();
+        super.onViewAttachedToWindow(holder);
+    }
+
     class MessageViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.message_avatar)
@@ -92,9 +121,26 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
 
         Message mMessage;
 
+        private final Handler mBackgroundHandler;
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                updateTimestamp(Helper.getRelativeTime(mMessage.getTimetoken() / 10_000L));
+                mBackgroundHandler.postDelayed(this, 1000);
+            }
+        };
+
         MessageViewHolder(View itemView) {
             super(itemView);
+
             ButterKnife.bind(this, itemView);
+
+            if (useRelativeTimestamps) {
+                mBackgroundHandler = new Handler(mHandlerThread.getLooper());
+            } else {
+                mBackgroundHandler = null;
+            }
         }
 
         void bindData(Message message) {
@@ -102,12 +148,30 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
 
             mBubble.setText(mMessage.getText());
             mSender.setText(mMessage.getUser().getDisplayName());
-            mTimestamp.setText(mMessage.getTimestamp());
+            if (!useRelativeTimestamps) {
+                mTimestamp.setText(mMessage.getTimestamp());
+            }
 
             GlideApp.with(this.itemView)
                     .load(mMessage.getUser().getProfilePictureUrl())
                     .apply(RequestOptions.circleCropTransform())
                     .into(mAvatar);
+        }
+
+        private void updateTimestamp(String timestamp) {
+            uiHandler.post(() -> mTimestamp.setText(timestamp));
+        }
+
+        void stop() {
+            if (useRelativeTimestamps) {
+                mBackgroundHandler.removeCallbacks(runnable);
+            }
+        }
+
+        void start() {
+            if (useRelativeTimestamps) {
+                mBackgroundHandler.post(runnable);
+            }
         }
     }
 
@@ -119,6 +183,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
         contentBuilder.append(AndroidUtils.newLine());
         contentBuilder.append(AndroidUtils.emphasizeText("Date time: "));
         contentBuilder.append(Helper.parseDateTime(message.getTimetoken() / 10_000L));
+        contentBuilder.append(AndroidUtils.newLine());
+        contentBuilder.append(AndroidUtils.emphasizeText("Relative: "));
+        contentBuilder.append(Helper.getRelativeTime(message.getTimetoken() / 10_000L));
 
         MaterialDialog materialDialog = new MaterialDialog.Builder(context)
                 .title(R.string.message_info)
@@ -127,4 +194,5 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
                 .build();
         materialDialog.show();
     }
+
 }

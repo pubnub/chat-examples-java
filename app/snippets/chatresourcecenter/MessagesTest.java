@@ -3,10 +3,12 @@ package chatresourcecenter;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.pubnub.api.PubNub;
+import com.pubnub.api.PubNubException;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
 import com.pubnub.api.models.consumer.PNPublishResult;
 import com.pubnub.api.models.consumer.PNStatus;
+import com.pubnub.api.models.consumer.history.PNHistoryResult;
 import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
 import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 
@@ -16,6 +18,7 @@ import org.junit.Test;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -126,6 +129,7 @@ public class MessagesTest extends TestHarness {
     @Test
     public void testSendImagesAndFiles() {
         // tag::MSG-3[]
+        // in progress
         // end::MSG-3[]
     }
 
@@ -157,7 +161,7 @@ public class MessagesTest extends TestHarness {
     @Test
     public void testShowMessageTimestamp() {
         final AtomicBoolean timestampShownSuccess = new AtomicBoolean(false);
-        // tag::MSG-7[]
+        // tag::MSG-5[]
         pubNub.addListener(new SubscribeCallback() {
             @Override
             public void status(PubNub pubnub, PNStatus status) {
@@ -201,13 +205,97 @@ public class MessagesTest extends TestHarness {
 
             }
         });
-        // end::MSG-7[]
+        // end::MSG-5[]
 
         pubNub.subscribe()
                 .channels(Arrays.asList("room-1"))
                 .execute();
 
         Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(timestampShownSuccess);
+    }
+
+    @Test
+    public void testUpdatingMessages() throws PubNubException, InterruptedException {
+        // tag::MSG-6.2[]
+        // progress
+        // end::MSG-6.2[]
+        // tag::MSG-6.1[]
+        // in
+        // end::MSG-6.1[]
+        final AtomicBoolean messageUpdatedSuccess = new AtomicBoolean(false);
+        final String expectedChannel = UUID.randomUUID().toString();
+        // final String expectedChannel = "apr19mo";
+
+        System.out.println("History " + getHistory(expectedChannel).getMessages().size());
+
+        Long initialTimeToken;
+
+        /*{
+            JsonObject messagePayload = new JsonObject();
+            messagePayload.addProperty("senderId", "user123");
+            messagePayload.addProperty("text", "Hello, hoomans!");
+
+            initialTimeToken = publishMessage(messagePayload, expectedChannel);
+            System.out.println("initial timetoken publish " + initialTimeToken);
+
+            TimeUnit.SECONDS.sleep(TIMEOUT_SHORT);
+
+            PNHistoryResult history = getHistory(expectedChannel);
+            System.out.println("History size: " + history.getMessages().size());
+            for (PNHistoryItemResult message : history.getMessages()) {
+                System.out.println("initial timetoken history " + message.getTimetoken());
+                System.out.println(message.getTimetoken() + ": " + message.getEntry());
+            }
+        }
+
+        // edit
+
+        {
+            JsonObject messagePayload = new JsonObject();
+            messagePayload.addProperty("senderId", "user123");
+            messagePayload.addProperty("text", "Edit: Hello, hoomans!");
+            messagePayload.addProperty("timetoken", initialTimeToken);
+
+            System.out.println("About to publish: " + messagePayload.toString());
+
+            Long secondTimetoken = publishMessage(messagePayload, expectedChannel);
+
+            TimeUnit.SECONDS.sleep(TIMEOUT_SHORT);
+
+            PNHistoryResult history = getHistory(expectedChannel);
+            System.out.println("History size: " + history.getMessages().size());
+            for (PNHistoryItemResult message : history.getMessages()) {
+                System.out.println(message.getTimetoken() + ": " + message.getEntry());
+            }
+        }*/
+
+        messageUpdatedSuccess.set(true);
+        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(messageUpdatedSuccess);
+    }
+
+    @Test
+    public void testSendingAnnouncements() {
+        final AtomicBoolean announcementSentSuccess = new AtomicBoolean(false);
+        // tag::MSG-7[]
+        // in progress
+        // end::MSG-7[]
+    }
+
+    private PNHistoryResult getHistory(String channel) throws PubNubException {
+        return pubNub.history()
+                .channel(channel)
+                .count(10)
+                .includeTimetoken(true)
+                .sync();
+    }
+
+    private Long publishMessage(JsonObject payload, String channel) throws PubNubException {
+        return pubNub.publish()
+                .message(payload)
+                .channel(channel)
+                .shouldStore(true)
+                .sync()
+                .getTimetoken();
     }
 
 }

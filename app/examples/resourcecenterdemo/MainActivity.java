@@ -1,6 +1,7 @@
 package resourcecenterdemo;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.widget.FrameLayout;
 
 import com.pubnub.api.PNConfiguration;
@@ -28,13 +29,14 @@ public class MainActivity extends ParentActivity implements ParentActivityImpl {
 
     final String channel = "demo-animal-forest";
     final String historyChannel = "much_history";
+    final String spareChannel = "apr19mo";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setSupportActionBar(mToolbar);
         initializePubNub();
-        addFragment(ChatFragment.newInstance(historyChannel));
+        addFragment(ChatFragment.newInstance(channel));
     }
 
     @Override
@@ -60,6 +62,13 @@ public class MainActivity extends ParentActivity implements ParentActivityImpl {
     @Override
     public void setTitle(String title) {
         mToolbar.setTitle(title);
+    }
+
+    @Override
+    public void setSubtitle(String subtitle) {
+        if (!TextUtils.isEmpty(subtitle)) {
+            mToolbar.setSubtitle(subtitle);
+        }
     }
 
     @Override

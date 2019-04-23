@@ -7,55 +7,53 @@
     android:layout_marginStart="100dp"
     android:layout_marginLeft="100dp"
     android:gravity="end"
-    android:paddingEnd="16dp"
-    android:paddingRight="16dp">
+    android:paddingEnd="@dimen/default_spacing"
+    android:paddingRight="@dimen/default_spacing"
+    tools:ignore="RtlSymmetry">
 
     <ImageView
         android:id="@+id/message_avatar"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_alignBottom="@id/message_bubble"
+        android:layout_width="@dimen/avatar_bubble_size"
+        android:layout_height="@dimen/avatar_bubble_size"
+        android:layout_alignTop="@id/message_bubble"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true" />
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="@dimen/half_spacing"
+        android:layout_marginLeft="@dimen/half_spacing"
+        tools:src="@drawable/honey_bee" />
 
     <TextView
         android:id="@+id/message_sender"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="2dp"
-        android:layout_marginRight="2dp"
-        android:layout_toStartOf="@id/message_timestamp"
-        android:layout_toLeftOf="@id/message_timestamp"
-        android:textColor="@color/message_metadata"
-        android:textSize="12sp"
+        android:layout_alignEnd="@id/message_bubble"
+        android:layout_alignRight="@id/message_bubble"
+        android:textColor="@color/message_metadata_user"
+        android:textSize="@dimen/message_metadata_text_size"
         android:textStyle="bold"
         tools:text="Monty the monkey" />
+
+    <TextView
+        android:id="@+id/message_bubble"
+        style="@style/MessageBubble"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/message_sender"
+        android:layout_toStartOf="@id/message_avatar"
+        android:layout_toLeftOf="@id/message_avatar"
+        android:background="@drawable/message_sent_bubble"
+        android:textColor="@color/message_sent_text"
+        tools:text="@string/lorem_ipsum_short" />
 
     <TextView
         android:id="@+id/message_timestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/message_bubble"
         android:layout_alignEnd="@id/message_bubble"
         android:layout_alignRight="@id/message_bubble"
-        android:layout_alignParentTop="true"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:textColor="@color/message_metadata"
-        android:textSize="12sp"
+        android:textColor="@color/message_metadata_timestamp"
+        android:textSize="@dimen/message_metadata_text_size"
         tools:text="7:22 PM" />
-
-    <TextView
-        android:id="@+id/message_bubble"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/message_timestamp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_toStartOf="@id/message_avatar"
-        android:layout_toLeftOf="@id/message_avatar"
-        android:background="@drawable/message_sent_bubble"
-        android:padding="8dp"
-        android:textColor="@color/message_sent_text"
-        tools:text="@string/lorem_ipsum_short" />
 
 </RelativeLayout>

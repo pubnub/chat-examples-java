@@ -11,9 +11,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:background="@color/colorPrimary"
-        android:elevation="5dp"
-        android:theme="@style/ToolBarStyle"
         app:title="@string/app_name" />
 
     <FrameLayout
