@@ -12,7 +12,6 @@ import org.awaitility.Awaitility;
 import org.junit.Test;
 
 import java.util.Collections;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -27,7 +26,7 @@ public class PresenceTest extends TestHarness {
     public void testReceivePresenceEvents() {
         final AtomicBoolean presenceEventReceivedSuccess = new AtomicBoolean(false);
 
-        String expectedChannel = UUID.randomUUID().toString();
+        String expectedChannel = randomUuid();
 
         pubNub.addListener(new SubscribeCallback() {
             @Override
@@ -75,12 +74,19 @@ public class PresenceTest extends TestHarness {
     public void testRequestOnDemandPresenceStatus() {
         final AtomicBoolean presenceStatusReceivedSuccess = new AtomicBoolean(false);
 
-        String expectedChannel = UUID.randomUUID().toString();
-
+        String expectedChannel = randomUuid();
+        
         pubNub.addListener(new SubscribeCallback() {
             @Override
             public void status(PubNub pubnub, PNStatus status) {
                 if (PnUtils.isSubscribed(status, expectedChannel)) {
+
+                    try {
+                        TimeUnit.SECONDS.sleep(TIMEOUT_SHORT);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
                     // tag::PRE-2[]
                     pubNub.hereNow()
                             // tag::ignore[]

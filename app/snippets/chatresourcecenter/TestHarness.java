@@ -6,6 +6,8 @@ import com.pubnub.api.PubNub;
 import org.junit.After;
 import org.junit.Before;
 
+import java.util.UUID;
+
 import resourcecenterdemo.BuildConfig;
 
 abstract class TestHarness {
@@ -22,12 +24,14 @@ abstract class TestHarness {
 
     @Before
     public void before() {
+        System.out.println("*** BEFORE ***");
         pubNub = getPubNubClient();
         observerClient = getPubNubClient();
     }
 
     @After
     public void after() {
+        System.out.println("*** AFTER ***");
         destroyClient(pubNub);
         destroyClient(observerClient);
     }
@@ -50,8 +54,14 @@ abstract class TestHarness {
         return pnConfiguration;
     }
 
-    public String getUuid() {
+    String getUuid() {
         return pubNub.getConfiguration().getUuid();
     }
+
+    String randomUuid(){
+        return UUID.randomUUID().toString();
+    }
+
+
 
 }
