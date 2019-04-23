@@ -4,7 +4,8 @@ sudo: required
 addons:
   apt:
     packages:
-      - lynx
+      - oracle-java8-installer
+
 
 jdk:
   - oraclejdk8
@@ -49,6 +50,4 @@ script:
 after_success:
   - node .travis.docs.js
   
-after_failure:
-  - if [ -f /home/travis/build/pubnub/chat-examples-java/Examples/build/reports/lint-results.html]; then lynx -dump /home/travis/build/pubnub/chat-examples-java/Examples/build/reports/lint-results.html; fi
-
+after_failure: true
