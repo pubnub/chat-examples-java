@@ -24,14 +24,12 @@ abstract class TestHarness {
 
     @Before
     public void before() {
-        System.out.println("*** BEFORE ***");
         pubNub = getPubNubClient();
         observerClient = getPubNubClient();
     }
 
     @After
     public void after() {
-        System.out.println("*** AFTER ***");
         destroyClient(pubNub);
         destroyClient(observerClient);
     }
