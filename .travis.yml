@@ -19,6 +19,11 @@ android:
     - extra-google-m2repository
     - extra-android-m2repository
 
+matrix:
+  allow_failures:
+    - jdk: openjdk-ea
+    - jdk: oraclejdk-ea
+
 stages:
   - examples
   - snippets
