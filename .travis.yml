@@ -4,12 +4,12 @@ sudo: required
 
 jdk:
   - oraclejdk11
-  - oraclejdk9
   - oraclejdk8
   - openjdk11
   - openjdk10
   - openjdk8
-  - openjdk7
+
+jdk: oraclejdk9
 
 android:
   components:
