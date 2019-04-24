@@ -2,6 +2,8 @@
 
 Source files for Java based chat example apps and document code samples live here.
 
+[![Build Status](https://travis-ci.com/pubnub/chat-examples-java.svg?token=33vivoVBsBm3RMEntDqx&branch=master)](https://travis-ci.com/pubnub/chat-examples-java)
+
 ## Requirements
 
 - Android 16+

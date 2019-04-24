@@ -4,11 +4,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.PubNubException;
+import com.pubnub.api.PubNubUtil;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
 import com.pubnub.api.models.consumer.PNPublishResult;
 import com.pubnub.api.models.consumer.PNStatus;
-import com.pubnub.api.models.consumer.history.PNHistoryResult;
 import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
 import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 
@@ -18,9 +18,9 @@ import org.junit.Test;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 import chatresourcecenter.mock.Log;
 
@@ -126,11 +126,30 @@ public class MessagesTest extends TestHarness {
 
     }
 
+    // tag::MSG-3[]
+    // Calculating a PubNub Message Payload Size
+    private int payloadSize(String channel, Object message) throws PubNubException {
+        String encodedPayload = PubNubUtil.urlEncode(channel + "/" + pubNub.getMapper().toJson(message));
+        System.out.println(encodedPayload);
+        return encodedPayload.length() + 150; // 150 is length of publish API prefix.
+    }
+    // end::MSG-3[]
+
     @Test
-    public void testSendImagesAndFiles() {
+    public void testSendImagesAndFiles() throws PubNubException {
         // tag::MSG-3[]
-        // in progress
+        // usage example
+        final String channel = "room-1";
+
+        JsonObject messagePayload = new JsonObject();
+        messagePayload.addProperty("senderId", "user123");
+        messagePayload.addProperty("text", "Hello World");
+
+        int size = payloadSize(channel, messagePayload);
+
+        Log.i("payload_size", String.valueOf(size));
         // end::MSG-3[]
+        assertEquals(230, size);
     }
 
     @Test
@@ -215,87 +234,213 @@ public class MessagesTest extends TestHarness {
     }
 
     @Test
-    public void testUpdatingMessages() throws PubNubException, InterruptedException {
-        // tag::MSG-6.2[]
-        // progress
-        // end::MSG-6.2[]
-        // tag::MSG-6.1[]
-        // in
-        // end::MSG-6.1[]
+    public void testUpdatingMessages() {
         final AtomicBoolean messageUpdatedSuccess = new AtomicBoolean(false);
-        final String expectedChannel = UUID.randomUUID().toString();
-        // final String expectedChannel = "apr19mo";
 
-        System.out.println("History " + getHistory(expectedChannel).getMessages().size());
+        final String expectedChannel = randomUuid();
+        final String expectedText = randomUuid();
+        final AtomicLong initialTimetoken = new AtomicLong(0);
 
-        Long initialTimeToken;
+        pubNub.addListener(new SubscribeCallback() {
+            @Override
+            public void status(PubNub pubnub, PNStatus status) {
+                if (PnUtils.isSubscribed(status, expectedChannel)) {
+                    // tag::MSG-6.1[]
+                    // tag::ignore[]
+                    /*
+                    // end::ignore[]
+                    Long firstMessageTimeToken;
+                    // tag::ignore[]
+                    */
+                    // end::ignore[]
 
-        /*{
-            JsonObject messagePayload = new JsonObject();
-            messagePayload.addProperty("senderId", "user123");
-            messagePayload.addProperty("text", "Hello, hoomans!");
+                    JsonObject messagePayload = new JsonObject();
+                    messagePayload.addProperty("senderId", "user123");
+                    messagePayload.addProperty("text", "Hello, hoomans!");
 
-            initialTimeToken = publishMessage(messagePayload, expectedChannel);
-            System.out.println("initial timetoken publish " + initialTimeToken);
-
-            TimeUnit.SECONDS.sleep(TIMEOUT_SHORT);
-
-            PNHistoryResult history = getHistory(expectedChannel);
-            System.out.println("History size: " + history.getMessages().size());
-            for (PNHistoryItemResult message : history.getMessages()) {
-                System.out.println("initial timetoken history " + message.getTimetoken());
-                System.out.println(message.getTimetoken() + ": " + message.getEntry());
+                    pubNub.publish()
+                            // tag::ignore[]
+                            .channel(expectedChannel)
+                            // end::ignore[]
+                            // tag::ignore[]
+                            /*
+                            // end::ignore[]
+                            .channel("room-1")
+                            // tag::ignore[]
+                            */
+                            // end::ignore[]
+                            .message(messagePayload)
+                            .async(new PNCallback<PNPublishResult>() {
+                                @Override
+                                public void onResponse(PNPublishResult result, PNStatus status) {
+                                    // tag::ignore[]
+                                    assertFalse(status.isError());
+                                    assertNotNull(result);
+                                    initialTimetoken.set(result.getTimetoken());
+                                    // end::ignore[]
+                                    // tag::ignore[]
+                                    /*
+                                    // end::ignore[]
+                                    if (!status.isError()) {
+                                        firstMessageTimeToken = result.getTimetoken();
+                                    }
+                                    // tag::ignore[]
+                                    */
+                                    // end::ignore[]
+                                }
+                            });
+                    // end::MSG-6.1[]
+                }
             }
-        }
 
-        // edit
+            @Override
+            public void message(PubNub pubnub, PNMessageResult message) {
+                if (message.getChannel().equals(expectedChannel) && message.getPublisher().equals(getUuid())) {
+                    if (!message.getMessage().getAsJsonObject().has("timetoken")) {
+                        // tag::MSG-6.2[]
+                        JsonObject messagePayload = new JsonObject();
+                        // tag::ignore[]
+                        /*
+                        // end::ignore[]
+                        messagePayload.addProperty("timetoken", firstMessageTimeToken);
+                        // tag::ignore[]
+                        */
+                        // end::ignore[]
+                        // tag::ignore[]
+                        messagePayload.addProperty("timetoken", message.getTimetoken());
+                        // end::ignore[]
+                        messagePayload.addProperty("senderId", "user123");
+                        // tag::ignore[]
+                        messagePayload.addProperty("text", expectedText);
+                        // end::ignore[]
+                        // tag::ignore[]
+                        /*
+                        // end::ignore[]
+                        messagePayload.addProperty("text", "Fixed. I had a typo earlier...");
+                        // tag::ignore[]
+                        */
+                        // end::ignore[]
 
-        {
-            JsonObject messagePayload = new JsonObject();
-            messagePayload.addProperty("senderId", "user123");
-            messagePayload.addProperty("text", "Edit: Hello, hoomans!");
-            messagePayload.addProperty("timetoken", initialTimeToken);
+                        pubNub.publish()
+                                // tag::ignore[]
+                                .channel(expectedChannel)
+                                // end::ignore[]
+                                // tag::ignore[]
+                                /*
+                                // end::ignore[]
+                                .channel("room-1")
+                                // tag::ignore[]
+                                */
+                                // end::ignore[]
+                                .message(messagePayload)
+                                .async(new PNCallback<PNPublishResult>() {
+                                    @Override
+                                    public void onResponse(PNPublishResult result, PNStatus status) {
+                                        // tag::ignore[]
+                                        assertFalse(status.isError());
+                                        assertNotNull(result);
+                                        // end::ignore[]
+                                        // handle status, response
+                                    }
+                                });
+                        // end::MSG-6.2[]
+                    } else {
+                        assertEquals(expectedText, message.getMessage().getAsJsonObject().get("text").getAsString());
+                        assertEquals(initialTimetoken.get(), message.getMessage()
+                                .getAsJsonObject()
+                                .get("timetoken")
+                                .getAsLong());
+                        messageUpdatedSuccess.set(true);
+                    }
 
-            System.out.println("About to publish: " + messagePayload.toString());
-
-            Long secondTimetoken = publishMessage(messagePayload, expectedChannel);
-
-            TimeUnit.SECONDS.sleep(TIMEOUT_SHORT);
-
-            PNHistoryResult history = getHistory(expectedChannel);
-            System.out.println("History size: " + history.getMessages().size());
-            for (PNHistoryItemResult message : history.getMessages()) {
-                System.out.println(message.getTimetoken() + ": " + message.getEntry());
+                }
             }
-        }*/
 
-        messageUpdatedSuccess.set(true);
+            @Override
+            public void presence(PubNub pubnub, PNPresenceEventResult presence) {
+
+            }
+        });
+
+        pubNub.subscribe()
+                .channels(Arrays.asList(expectedChannel))
+                .withPresence()
+                .execute();
+
         Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(messageUpdatedSuccess);
     }
 
     @Test
     public void testSendingAnnouncements() {
         final AtomicBoolean announcementSentSuccess = new AtomicBoolean(false);
-        // tag::MSG-7[]
-        // in progress
-        // end::MSG-7[]
-    }
 
-    private PNHistoryResult getHistory(String channel) throws PubNubException {
-        return pubNub.history()
-                .channel(channel)
-                .count(10)
-                .includeTimetoken(true)
-                .sync();
-    }
+        final String expectedChannel = randomUuid();
+        final String expectedText = randomUuid();
 
-    private Long publishMessage(JsonObject payload, String channel) throws PubNubException {
-        return pubNub.publish()
-                .message(payload)
-                .channel(channel)
-                .shouldStore(true)
-                .sync()
-                .getTimetoken();
+        observerClient.addListener(new SubscribeCallback() {
+            @Override
+            public void status(PubNub pubnub, PNStatus status) {
+                if (PnUtils.isSubscribed(status, expectedChannel)) {
+
+                    // tag::MSG-7[]
+                    JsonObject messagePayload = new JsonObject();
+                    messagePayload.addProperty("senderId", "user123");
+                    // tag::ignore[]
+                    /*
+                    // end::ignore[]
+                    messagePayload.addProperty("text", "Hello, this is an announcement");
+                    // tag::ignore[]
+                    */
+                    // end::ignore[]
+                    // tag::ignore[]
+                    messagePayload.addProperty("text", expectedText);
+                    // end::ignore[]
+
+                    pubNub.publish()
+                            .message(messagePayload)
+                            // tag::ignore[]
+                            .channel(expectedChannel)
+                            // end::ignore[]
+                            // tag::ignore[]
+                            /*
+                            // end::ignore[]
+                            .channel("room-1")
+                            // tag::ignore[]
+                            */
+                            // end::ignore[]
+                            .async(new PNCallback<PNPublishResult>() {
+                                @Override
+                                public void onResponse(PNPublishResult result, PNStatus status) {
+                                    // tag::ignore[]
+                                    assertFalse(status.isError());
+                                    assertNotNull(result);
+                                    // end::ignore[]
+                                    // handle status, response
+                                }
+                            });
+                    // end::MSG-7[]
+                }
+            }
+
+            @Override
+            public void message(PubNub pubnub, PNMessageResult message) {
+                if (message.getChannel().equals(expectedChannel) && message.getPublisher().equals(getUuid())) {
+                    assertEquals(expectedText, message.getMessage().getAsJsonObject().get("text").getAsString());
+                    announcementSentSuccess.set(true);
+                }
+            }
+
+            @Override
+            public void presence(PubNub pubnub, PNPresenceEventResult presence) {
+
+            }
+        });
+
+        observerClient.subscribe()
+                .channels(Arrays.asList(expectedChannel))
+                .execute();
+
+        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(announcementSentSuccess);
     }
 
 }

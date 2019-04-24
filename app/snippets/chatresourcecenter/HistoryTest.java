@@ -30,24 +30,6 @@ import static org.junit.Assert.assertTrue;
 
 public class HistoryTest extends TestHarness {
 
-    interface Callback {
-
-        void onDone();
-    }
-
-    private void publishMessages(String channel, int count, Callback callback) throws PubNubException,
-            InterruptedException {
-        for (int i = 0; i < count; i++) {
-            pubNub.publish()
-                    .channel(channel)
-                    .message("#" + (i + 1) + " " + UUID.randomUUID())
-                    .shouldStore(true)
-                    .sync();
-        }
-        TimeUnit.SECONDS.sleep(TIMEOUT_SHORT);
-        callback.onDone();
-    }
-
     @Test
     public void testFetchMessageCount() {
         final AtomicBoolean messageCountSuccess = new AtomicBoolean(false);
@@ -63,7 +45,7 @@ public class HistoryTest extends TestHarness {
         final AtomicBoolean pastMessagesSuccess = new AtomicBoolean(false);
 
         final int count = 10;
-        String channel = UUID.randomUUID().toString();
+        String channel = randomUuid();
         publishMessages(channel, count, () -> {
 
             Calendar cal = Calendar.getInstance();
@@ -124,7 +106,7 @@ public class HistoryTest extends TestHarness {
         final AtomicInteger resursiveHistoryCount = new AtomicInteger(0);
         final int publishMessageCount = 110;
         final int expectedHistoryCallCount = 2;
-        final String channel = UUID.randomUUID().toString();
+        final String channel = randomUuid();
 
         publishMessages(channel, publishMessageCount, () -> {
             getAllMessages(channel, null, resursiveHistoryCount);
@@ -225,7 +207,7 @@ public class HistoryTest extends TestHarness {
         final int messagesCount = 2;
         List<String> channels = new ArrayList<>(channelsCount);
         for (int i = 0; i < channelsCount; i++) {
-            channels.add(UUID.randomUUID().toString());
+            channels.add(randomUuid());
             publishMessages(channels.get(i), messagesCount, () -> {
 
             });
@@ -288,6 +270,24 @@ public class HistoryTest extends TestHarness {
                 });
         // end::HIST-4[]
         Awaitility.await().atMost(TIMEOUT_LONG, TimeUnit.SECONDS).untilTrue(pastMessagesSuccess);
+    }
+
+    interface Callback {
+
+        void onDone();
+    }
+
+    private void publishMessages(String channel, int count, Callback callback) throws PubNubException,
+            InterruptedException {
+        for (int i = 0; i < count; i++) {
+            pubNub.publish()
+                    .channel(channel)
+                    .message("#" + (i + 1) + " " + UUID.randomUUID())
+                    .shouldStore(true)
+                    .sync();
+        }
+        TimeUnit.SECONDS.sleep(TIMEOUT_SHORT);
+        callback.onDone();
     }
 
 }

@@ -6,6 +6,8 @@ import com.pubnub.api.PubNub;
 import org.junit.After;
 import org.junit.Before;
 
+import java.util.UUID;
+
 import resourcecenterdemo.BuildConfig;
 
 abstract class TestHarness {
@@ -50,8 +52,12 @@ abstract class TestHarness {
         return pnConfiguration;
     }
 
-    public String getUuid() {
+    String getUuid() {
         return pubNub.getConfiguration().getUuid();
+    }
+
+    String randomUuid() {
+        return UUID.randomUUID().toString();
     }
 
 }

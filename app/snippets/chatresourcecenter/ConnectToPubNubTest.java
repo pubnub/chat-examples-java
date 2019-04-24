@@ -5,7 +5,6 @@ import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
-import com.pubnub.api.enums.PNOperationType;
 import com.pubnub.api.enums.PNReconnectionPolicy;
 import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.presence.PNGetStateResult;
@@ -16,8 +15,7 @@ import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 import org.awaitility.Awaitility;
 import org.junit.Test;
 
-import java.util.Collections;
-import java.util.UUID;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -53,7 +51,7 @@ public class ConnectToPubNubTest extends TestHarness {
     @Test
     public void testSettingUuid() {
 
-        String uuid = UUID.randomUUID().toString();
+        String uuid = randomUuid();
         // tag::CON-3[]
         PNConfiguration pnConfiguration = new PNConfiguration();
         pnConfiguration.setSubscribeKey(SUB_KEY);
@@ -70,13 +68,24 @@ public class ConnectToPubNubTest extends TestHarness {
     @Test
     public void testSettingState() {
         final AtomicBoolean setStateSuccess = new AtomicBoolean(false);
+        final String expectedChannel = randomUuid();
+
         // tag::CON-4[]
         JsonObject state = new JsonObject();
         state.addProperty("mood", "grumpy");
 
         pubNub.setPresenceState()
                 .state(state)
-                .channels(Collections.singletonList("room-1"))
+                // tag::ignore[]
+                .channels(Arrays.asList(expectedChannel))
+                // end::ignore[]
+                // tag::ignore[]
+                /*
+                // end::ignore[]
+                .channels(Arrays.asList("room-1"))
+                // tag::ignore[]
+                */
+                // end::ignore[]
                 .async(new PNCallback<PNSetStateResult>() {
                     @Override
                     public void onResponse(PNSetStateResult result, PNStatus status) {
@@ -98,7 +107,16 @@ public class ConnectToPubNubTest extends TestHarness {
         final AtomicBoolean getStateSuccess = new AtomicBoolean(false);
         // tag::CON-5[]
         pubNub.getPresenceState()
-                .channels(Collections.singletonList("room-1"))
+                // tag::ignore[]
+                .channels(Arrays.asList(expectedChannel))
+                // end::ignore[]
+                // tag::ignore[]
+                /*
+                // end::ignore[]
+                .channels(Arrays.asList("room-1"))
+                // tag::ignore[]
+                */
+                // end::ignore[]
                 .async(new PNCallback<PNGetStateResult>() {
                     @Override
                     public void onResponse(PNGetStateResult result, PNStatus status) {
@@ -107,7 +125,7 @@ public class ConnectToPubNubTest extends TestHarness {
                         assertNotNull(result);
                         assertFalse(status.isError());
                         assertEquals(result.getStateByUUID()
-                                .get("room-1")
+                                .get(expectedChannel)
                                 .getAsJsonObject()
                                 .get("mood"), state.get("mood"));
                         getStateSuccess.set(true);
@@ -125,13 +143,23 @@ public class ConnectToPubNubTest extends TestHarness {
     @Test
     public void testDisconnecting() {
         final AtomicBoolean unsubscribedSuccess = new AtomicBoolean(false);
+        final String expectedChannel = randomUuid();
 
         observerClient.addListener(new SubscribeCallback() {
             @Override
             public void status(PubNub pubnub, PNStatus status) {
-                if (PnUtils.isSubscribed(status, "room-1")) {
+                if (PnUtils.isSubscribed(status, expectedChannel)) {
                     pubNub.subscribe()
-                            .channels(Collections.singletonList("room-1"))
+                            // tag::ignore[]
+                            .channels(Arrays.asList(expectedChannel))
+                            // end::ignore[]
+                            // tag::ignore[]
+                            /*
+                            // end::ignore[]
+                            .channels(Arrays.asList("room-1"))
+                            // tag::ignore[]
+                            */
+                            // end::ignore[]
                             .withPresence()
                             .execute();
                 }
@@ -144,7 +172,6 @@ public class ConnectToPubNubTest extends TestHarness {
 
             @Override
             public void presence(PubNub pubnub, PNPresenceEventResult presence) {
-                PnUtils.printPresence(presence);
                 if (presence.getEvent().equals("leave") && presence.getUuid()
                         .equals(pubNub.getConfiguration().getUuid())) {
                     unsubscribedSuccess.set(true);
@@ -155,7 +182,7 @@ public class ConnectToPubNubTest extends TestHarness {
         pubNub.addListener(new SubscribeCallback() {
             @Override
             public void status(PubNub pubnub, PNStatus status) {
-                if (status.getOperation() == PNOperationType.PNSubscribeOperation) {
+                if (PnUtils.isSubscribed(status, expectedChannel)) {
                     // tag::CON-6[]
                     pubNub.unsubscribeAll();
                     // end::CON-6[]
@@ -174,7 +201,16 @@ public class ConnectToPubNubTest extends TestHarness {
         });
 
         observerClient.subscribe()
-                .channels(Collections.singletonList("room-1"))
+                // tag::ignore[]
+                .channels(Arrays.asList(expectedChannel))
+                // end::ignore[]
+                // tag::ignore[]
+                /*
+                // end::ignore[]
+                .channels(Arrays.asList("room-1"))
+                // tag::ignore[]
+                */
+                // end::ignore[]
                 .withPresence()
                 .execute();
 

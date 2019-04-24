@@ -16,7 +16,6 @@ import org.awaitility.Awaitility;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -27,42 +26,80 @@ public class PushNotificationTest extends TestHarness {
 
     @Test
     public void testAddDeviceToken() {
-        String firebaseInstanceId = UUID.randomUUID().toString();
+        final AtomicBoolean pushRegisteredSuccess = new AtomicBoolean(false);
+
+        final String expectedChannel = randomUuid();
+        final String firebaseInstanceId = randomUuid();
+
         // tag::PUSH-1[]
         pubNub.addPushNotificationsOnChannels()
+                // tag::ignore[]
+                .channels(Arrays.asList(expectedChannel))
+                // end::ignore[]
+                // tag::ignore[]
+                /*
+                // end::ignore[]
                 .channels(Arrays.asList("ch1"))
+                // tag::ignore[]
+                */
+                // end::ignore[]
                 .pushType(PNPushType.GCM)
                 .deviceId(firebaseInstanceId)
                 .async(new PNCallback<PNPushAddChannelResult>() {
                     @Override
                     public void onResponse(PNPushAddChannelResult result, PNStatus status) {
-
+                        // handle status, response
+                        // tag::ignore[]
+                        assertFalse(status.isError());
+                        assertNotNull(result);
+                        pushRegisteredSuccess.set(true);
+                        // end::ignore[]
                     }
                 });
         // end::PUSH-1[]
+        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(pushRegisteredSuccess);
     }
 
     @Test
     public void testRemoveDeviceToken() {
-        String firebaseInstanceId = UUID.randomUUID().toString();
+        final AtomicBoolean pushUnregisteredSuccess = new AtomicBoolean(false);
+
+        final String expectedChannel = randomUuid();
+        final String firebaseInstanceId = randomUuid();
+
         // tag::PUSH-2[]
         pubNub.removePushNotificationsFromChannels()
+                // tag::ignore[]
+                .channels(Arrays.asList(expectedChannel))
+                // end::ignore[]
+                // tag::ignore[]
+                /*
+                // end::ignore[]
                 .channels(Arrays.asList("ch1"))
+                // tag::ignore[]
+                */
+                // end::ignore[]
                 .pushType(PNPushType.GCM)
                 .deviceId(firebaseInstanceId)
                 .async(new PNCallback<PNPushRemoveChannelResult>() {
                     @Override
                     public void onResponse(PNPushRemoveChannelResult result, PNStatus status) {
                         // handle status, response
+                        // tag::ignore[]
+                        assertFalse(status.isError());
+                        assertNotNull(result);
+                        pushUnregisteredSuccess.set(true);
+                        // end::ignore[]
                     }
                 });
         // end::PUSH-2[]
+        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(pushUnregisteredSuccess);
     }
 
     @Test
     public void testFormattingMessages() {
         final AtomicBoolean formattedMessageSentSuccess = new AtomicBoolean(false);
-        final String expectedChannel = UUID.randomUUID().toString();
+        final String expectedChannel = randomUuid();
 
         observerClient.addListener(new SubscribeCallback() {
             @Override
