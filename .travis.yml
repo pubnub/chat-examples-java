@@ -3,13 +3,12 @@ language: android
 sudo: required
 
 jdk:
-  - oraclejdk11
-  - oraclejdk8
-  - openjdk11
-  - openjdk10
   - openjdk8
-
-jdk: oraclejdk9
+  - openjdk11
+  - openjdk-ea
+  - oraclejdk8
+  - oraclejdk11
+  - oraclejdk-ea
 
 android:
   components:
