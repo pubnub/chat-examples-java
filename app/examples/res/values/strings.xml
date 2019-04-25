@@ -12,4 +12,6 @@
     <string name="channel_empty">No messages in this channel</string>
     <string name="no_more_messages">No more messages</string>
     <string name="members_online">%d members online</string>
+    <string name="welcome_to">Welcome to</string>
+    <string name="animal_forest_chat">Animal Forest Chat</string>
 </resources>
