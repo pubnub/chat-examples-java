@@ -10,12 +10,12 @@
     </style>
 
     <style name="ToolbarTextAppearance.Title" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
-        <item name="android:textSize">15sp</item>
-        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">16sp</item>
+        <!--<item name="android:textStyle">bold</item>-->
     </style>
 
     <style name="ToolbarTextAppearance.Subtitle" parent="TextAppearance.Widget.AppCompat.Toolbar.Subtitle">
-        <item name="android:textSize">11sp</item>
+        <item name="android:textSize">12sp</item>
     </style>
 
 </resources>
