@@ -14,4 +14,8 @@ public interface ParentActivityImpl {
 
     void addFragment(Fragment fragment);
 
+    void enableBackButton(boolean enable);
+
+    void backPress();
+
 }

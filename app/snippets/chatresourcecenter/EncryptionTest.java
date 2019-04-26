@@ -61,4 +61,11 @@ public class EncryptionTest extends TestHarness {
         assertEquals(expectedString, decrypted);
     }
 
+    @Test
+    public void testSendSignedMessage() {
+        // tag::ENCR-3[]
+        // in progress
+        // end::ENCR-3[]
+    }
+
 }

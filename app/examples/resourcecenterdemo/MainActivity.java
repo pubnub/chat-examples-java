@@ -2,6 +2,7 @@ package resourcecenterdemo;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.MenuItem;
 import android.widget.FrameLayout;
 
 import com.pubnub.api.PNConfiguration;
@@ -36,7 +37,7 @@ public class MainActivity extends ParentActivity implements ParentActivityImpl {
         super.onCreate(savedInstanceState);
         setSupportActionBar(mToolbar);
         initializePubNub();
-        addFragment(ChatFragment.newInstance(channel));
+        addFragment(ChatFragment.newInstance(spareChannel));
     }
 
     @Override
@@ -52,6 +53,11 @@ public class MainActivity extends ParentActivity implements ParentActivityImpl {
         pnConfiguration.setLogVerbosity(PNLogVerbosity.BODY);
         pnConfiguration.setReconnectionPolicy(PNReconnectionPolicy.LINEAR);
         mPubNub = new PubNub(pnConfiguration);
+
+        // tag::KEYS-2[]
+        String pubKey = BuildConfig.PUB_KEY;
+        String subKey = BuildConfig.SUB_KEY;
+        // end::KEYS-2[]
     }
 
     @Override
@@ -74,6 +80,27 @@ public class MainActivity extends ParentActivity implements ParentActivityImpl {
     @Override
     public void addFragment(Fragment fragment) {
         super.addFragment(fragment);
+    }
+
+    @Override
+    public void enableBackButton(boolean enable) {
+        getSupportActionBar().setDisplayHomeAsUpEnabled(enable);
+        getSupportActionBar().setDisplayShowHomeEnabled(enable);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // handle arrow click here
+        if (item.getItemId() == android.R.id.home) {
+            backPress();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void backPress() {
+        onBackPressed();
     }
 
     @Override

@@ -249,7 +249,7 @@ public class MessagesTest extends TestHarness {
                     // tag::ignore[]
                     /*
                     // end::ignore[]
-                    Long firstMessageTimeToken;
+                    Long firstMessageTimeToken; // keep track of message timetoken that should be edited later
                     // tag::ignore[]
                     */
                     // end::ignore[]
@@ -282,13 +282,14 @@ public class MessagesTest extends TestHarness {
                                     /*
                                     // end::ignore[]
                                     if (!status.isError()) {
-                                        firstMessageTimeToken = result.getTimetoken();
+                                        firstMessageTimeToken = result.getTimetoken(); // save timetoken
                                     }
                                     // tag::ignore[]
                                     */
                                     // end::ignore[]
                                 }
                             });
+
                     // end::MSG-6.1[]
                 }
             }
@@ -298,10 +299,13 @@ public class MessagesTest extends TestHarness {
                 if (message.getChannel().equals(expectedChannel) && message.getPublisher().equals(getUuid())) {
                     if (!message.getMessage().getAsJsonObject().has("timetoken")) {
                         // tag::MSG-6.2[]
+
+                        // edit the message
                         JsonObject messagePayload = new JsonObject();
                         // tag::ignore[]
                         /*
                         // end::ignore[]
+                        // attach timetoken of previous message
                         messagePayload.addProperty("timetoken", firstMessageTimeToken);
                         // tag::ignore[]
                         */

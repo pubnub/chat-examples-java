@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?android:windowBackground"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/info_channel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="18sp"
+        android:visibility="gone"
         tools:text="Animal chat" />
 
     <TextView
@@ -22,6 +23,7 @@
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
         android:textSize="14sp"
+        android:visibility="gone"
         tools:text="@string/lorem_ipsum_long" />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -30,4 +32,11 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/info_description" />
 
+    <resourcecenterdemo.view.EmptyView
+        android:id="@+id/info_empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        app:evMessage="@string/no_members" />
 </RelativeLayout>

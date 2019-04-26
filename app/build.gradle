@@ -6,18 +6,24 @@ check.dependsOn('checkstyle')
 def snippetsPath = "snippets"
 def examplesPath = "examples"
 
+// tag::KEYS-1[]
 android {
     compileSdkVersion 28
     defaultConfig {
+        // tag::ignore[]
         applicationId "com.pubnub.crc.android"
+        // tag::ignore[]
         minSdkVersion 16
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
+        // tag::ignore[]
         vectorDrawables.useSupportLibrary = true
+        // tag::ignore[]
         buildConfigField "String", "PUB_KEY", PUB_KEY
         buildConfigField "String", "SUB_KEY", SUB_KEY
     }
+// end::KEYS-1[]
     buildTypes {
         release {
             minifyEnabled false

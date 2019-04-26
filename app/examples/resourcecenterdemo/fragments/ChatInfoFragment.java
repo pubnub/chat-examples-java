@@ -1,6 +1,7 @@
 package resourcecenterdemo.fragments;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 
 import com.pubnub.api.PubNub;
@@ -17,14 +18,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import resourcecenterdemo.R;
-import resourcecenterdemo.adapters.UserAdapter;
-import resourcecenterdemo.model.Users;
-import resourcecenterdemo.pubnub.User;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
+import resourcecenterdemo.R;
+import resourcecenterdemo.adapters.UserAdapter;
+import resourcecenterdemo.model.Users;
+import resourcecenterdemo.pubnub.User;
+import resourcecenterdemo.view.EmptyView;
 
 public class ChatInfoFragment extends ParentFragment {
 
@@ -38,6 +40,9 @@ public class ChatInfoFragment extends ParentFragment {
 
     @BindView(R.id.info_recycler_view)
     RecyclerView mUsersRecyclerView;
+
+    @BindView(R.id.info_empty_view)
+    EmptyView mEmptyView;
 
     UserAdapter mUserAdapter;
     List<User> mUsers = new ArrayList<>();
@@ -72,7 +77,8 @@ public class ChatInfoFragment extends ParentFragment {
 
     @Override
     public String setScreenTitle() {
-        return fragmentContext.getResources().getString(R.string.group_info);
+        hostActivity.enableBackButton(true);
+        return mChannel;
     }
 
     @Override
@@ -121,9 +127,29 @@ public class ChatInfoFragment extends ParentFragment {
                     case "state-change":
                         break;
                 }
+
+                handleUiVisibility();
+
                 runOnUiThread(() -> mUserAdapter.notifyDataSetChanged());
             }
         };
+    }
+
+    private void handleUiVisibility() {
+        int viewState = -1;
+
+        if (mUsers.size() > 0) {
+            if (mEmptyView.getVisibility() != View.GONE)
+                viewState = View.GONE;
+        } else {
+            if (mEmptyView.getVisibility() != View.VISIBLE)
+                viewState = View.VISIBLE;
+        }
+
+        if (viewState != -1) {
+            int finalViewState = viewState;
+            runOnUiThread(() -> mEmptyView.setVisibility(finalViewState));
+        }
     }
 
     @Override
@@ -161,4 +187,5 @@ public class ChatInfoFragment extends ParentFragment {
     public SubscribeCallback provideListener() {
         return mPubNubListener;
     }
+
 }
