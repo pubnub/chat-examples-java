@@ -78,7 +78,7 @@ public class ChatInfoFragment extends ParentFragment {
     @Override
     public String setScreenTitle() {
         hostActivity.enableBackButton(true);
-        return fragmentContext.getResources().getString(R.string.group_info);
+        return mChannel;
     }
 
     @Override

@@ -53,6 +53,11 @@ public class MainActivity extends ParentActivity implements ParentActivityImpl {
         pnConfiguration.setLogVerbosity(PNLogVerbosity.BODY);
         pnConfiguration.setReconnectionPolicy(PNReconnectionPolicy.LINEAR);
         mPubNub = new PubNub(pnConfiguration);
+
+        // tag::KEYS-2[]
+        String pubKey = BuildConfig.PUB_KEY;
+        String subKey = BuildConfig.SUB_KEY;
+        // end::KEYS-2[]
     }
 
     @Override
