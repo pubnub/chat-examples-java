@@ -1,8 +1,8 @@
 package resourcecenterdemo.pubnub;
 
-import resourcecenterdemo.model.Users;
-
 import androidx.annotation.Nullable;
+import resourcecenterdemo.model.Users;
+import resourcecenterdemo.prefs.Prefs;
 
 public class User {
 
@@ -50,11 +50,15 @@ public class User {
         return status;
     }
 
+    public boolean isMe() {
+        return Prefs.get().uuid().equals(user.getUuid());
+    }
+
     @Override
     public boolean equals(@Nullable Object obj) {
         if (obj instanceof User) {
             return ((User) obj).user.getUuid().equals(user.getUuid());
         }
-        return super.equals(obj);
+        return false;
     }
 }

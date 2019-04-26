@@ -36,6 +36,7 @@
             android:background="?selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
+            android:visibility="gone"
             android:scaleType="centerInside"
             android:contentDescription="@string/attach"
             app:srcCompat="@drawable/ic_attachment" />

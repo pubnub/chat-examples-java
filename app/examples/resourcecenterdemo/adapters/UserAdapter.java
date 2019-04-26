@@ -10,14 +10,14 @@ import com.bumptech.glide.request.RequestOptions;
 
 import java.util.List;
 
-import resourcecenterdemo.R;
-import resourcecenterdemo.pubnub.User;
-import resourcecenterdemo.util.GlideApp;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import resourcecenterdemo.R;
+import resourcecenterdemo.pubnub.User;
+import resourcecenterdemo.util.GlideApp;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
 
@@ -75,7 +75,13 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             this.mUser = user;
 
             mUsername.setText(this.mUser.getUser().getDisplayName());
-            mStatus.setText(this.mUser.getStatus());
+            if (this.mUser.isMe()) {
+                mStatus.setText(R.string.you);
+                mStatus.setTextColor(mStatus.getResources().getColor(R.color.colorPrimary));
+            } else {
+                mStatus.setText(this.mUser.getUser().getDesignation());
+                mStatus.setTextColor(mStatus.getResources().getColor(R.color.text_secondary));
+            }
 
             GlideApp.with(this.itemView)
                     .load(user.getUser().getProfilePictureUrl())

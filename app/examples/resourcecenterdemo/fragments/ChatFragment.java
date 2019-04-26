@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.pubnub.api.PubNub;
@@ -34,6 +35,7 @@ import resourcecenterdemo.R;
 import resourcecenterdemo.adapters.ChatAdapter;
 import resourcecenterdemo.pubnub.History;
 import resourcecenterdemo.pubnub.Message;
+import resourcecenterdemo.view.EmptyView;
 import resourcecenterdemo.view.MessageComposer;
 
 public class ChatFragment extends ParentFragment implements MessageComposer.Listener {
@@ -48,6 +50,9 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
 
     @BindView(R.id.chats_message_composer)
     MessageComposer mMessageComposer;
+
+    @BindView(R.id.chat_empty_view)
+    EmptyView mEmptyView;
 
     ChatAdapter mChatAdapter;
     List<Message> mMessages = new ArrayList<>();
@@ -144,6 +149,7 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
 
     @Override
     public String setScreenTitle() {
+        hostActivity.enableBackButton(false);
         scrollChatToBottom();
         loadCurrentOccupancy();
         return mChannel;
@@ -205,6 +211,9 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
             Message msg = Message.serialize(message);
             mMessages.add(msg);
             runOnUiThread(() -> {
+                if (mEmptyView.getVisibility() == View.VISIBLE) {
+                    mEmptyView.setVisibility(View.GONE);
+                }
                 mChatAdapter.notifyItemInserted(mChatAdapter.getItemCount());
                 scrollChatToBottom();
             });
@@ -231,9 +240,7 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
                                 mMessages.addAll(0, messages);
                                 mChatAdapter.notifyItemRangeInserted(0, messages.size());
                             } else if (mMessages.isEmpty()) {
-                                Toast.makeText(fragmentContext, getString(R.string.channel_empty),
-                                        Toast.LENGTH_SHORT)
-                                        .show();
+                                mEmptyView.setVisibility(View.VISIBLE);
                             } else {
                                 Toast.makeText(fragmentContext, getString(R.string.no_more_messages),
                                         Toast.LENGTH_SHORT)

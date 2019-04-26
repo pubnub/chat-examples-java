@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -20,6 +21,16 @@
             android:scrollbars="vertical" />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <resourcecenterdemo.view.EmptyView
+        android:id="@+id/chat_empty_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:elevation="3dp"
+        android:visibility="gone"
+        app:evMessage="@string/no_messages"
+        tools:targetApi="lollipop" />
 
     <resourcecenterdemo.view.MessageComposer
         android:id="@+id/chats_message_composer"
