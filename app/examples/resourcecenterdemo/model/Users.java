@@ -127,7 +127,7 @@ public class Users {
 
             private String firstName;
             private String lastName;
-            private String uuid;
+            private String uuid = "null";
             private Integer profilePictureUrl;
             private String designation;
 

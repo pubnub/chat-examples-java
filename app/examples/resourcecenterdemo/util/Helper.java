@@ -1,6 +1,7 @@
 package resourcecenterdemo.util;
 
 import android.annotation.SuppressLint;
+import android.text.format.DateFormat;
 import android.text.format.DateUtils;
 
 import java.math.BigInteger;
@@ -9,6 +10,8 @@ import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
+
+import resourcecenterdemo.App;
 
 public class Helper {
 
@@ -40,10 +43,9 @@ public class Helper {
 
     public static String parseTime(long timetoken) {
         @SuppressLint("SimpleDateFormat")
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(timetoken);
-        return sdf.format(calendar.getTime());
+        return DateFormat.getTimeFormat(App.get()).format(calendar.getTime());
     }
 
     public static String parseDateTimeIso8601(long timetoken) {
@@ -60,6 +62,16 @@ public class Helper {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(timetoken);
         return sdf.format(calendar.getTime());
+    }
+
+    public static long trimTime(long timetoken) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timetoken);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTimeInMillis();
     }
 
     public static String getRelativeTime(long timetoken) {

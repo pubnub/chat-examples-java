@@ -1,9 +1,6 @@
 package resourcecenterdemo.adapters;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Looper;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,9 +11,11 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.bumptech.glide.request.RequestOptions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -27,48 +26,45 @@ import resourcecenterdemo.util.AndroidUtils;
 import resourcecenterdemo.util.GlideApp;
 import resourcecenterdemo.util.Helper;
 
-public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHolder> {
+import static resourcecenterdemo.util.ChatItem.TYPE_OWN_END;
+import static resourcecenterdemo.util.ChatItem.TYPE_OWN_HEADER;
+import static resourcecenterdemo.util.ChatItem.TYPE_OWN_MIDDLE;
+import static resourcecenterdemo.util.ChatItem.TYPE_REC_END;
+import static resourcecenterdemo.util.ChatItem.TYPE_REC_HEADER;
+import static resourcecenterdemo.util.ChatItem.TYPE_REC_MIDDLE;
 
-    private final int TYPE_TXT_OWN = 0;
-    private final int TYPE_TXT_REC = 1;
+public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHolder> {
 
     private final String mChannel;
 
     private List<Message> mItems;
 
-    private Handler uiHandler;
-    private HandlerThread mHandlerThread = new HandlerThread("mHandlerThread");
-
-    boolean useRelativeTimestamps = false;
-
-    public ChatAdapter(String channel, List<Message> items) {
-        uiHandler = new Handler(Looper.getMainLooper());
+    public ChatAdapter(String channel) {
         mChannel = channel;
-        mItems = items;
-        if (useRelativeTimestamps) {
-            mHandlerThread.start();
-        }
+        mItems = new ArrayList<>();
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (mItems.get(position).isOwnMessage())
-            return TYPE_TXT_OWN;
-        return TYPE_TXT_REC;
+        return mItems.get(position).getType();
     }
 
     @NonNull
     @Override
     public MessageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         switch (viewType) {
-            case TYPE_TXT_OWN:
+            case TYPE_OWN_HEADER:
+            case TYPE_OWN_MIDDLE:
+            case TYPE_OWN_END:
                 View sentMessageView = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.item_message_sent, parent, false);
-                return new MessageViewHolder(sentMessageView);
-            case TYPE_TXT_REC:
+                return new MessageViewHolder(sentMessageView, viewType);
+            case TYPE_REC_HEADER:
+            case TYPE_REC_MIDDLE:
+            case TYPE_REC_END:
                 View receivedMessageView = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.item_message_received, parent, false);
-                return new MessageViewHolder(receivedMessageView);
+                return new MessageViewHolder(receivedMessageView, viewType);
         }
         throw new IllegalStateException("No applicable viewtype found.");
     }
@@ -88,19 +84,31 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
         return mItems.get(position).getTimetoken();
     }
 
-    @Override
-    public void onViewDetachedFromWindow(@NonNull MessageViewHolder holder) {
-        holder.stop();
-        super.onViewDetachedFromWindow(holder);
+    public void update(List<Message> newData) {
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallback(newData, mItems));
+        diffResult.dispatchUpdatesTo(this);
+        mItems.clear();
+        mItems.addAll(newData);
     }
 
-    @Override
-    public void onViewAttachedToWindow(@NonNull MessageViewHolder holder) {
-        holder.start();
-        super.onViewAttachedToWindow(holder);
+    class DateViewHolder extends RecyclerView.ViewHolder {
+
+        @BindView(R.id.item_date)
+        TextView mDateTextView;
+
+        public DateViewHolder(@NonNull View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        void bindData(Long key) {
+            mDateTextView.setText(Helper.parseDateTime(key));
+        }
     }
 
     class MessageViewHolder extends RecyclerView.ViewHolder {
+
+        private int mType;
 
         @BindView(R.id.message_avatar)
         ImageView mAvatar;
@@ -121,58 +129,87 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
 
         Message mMessage;
 
-        private final Handler mBackgroundHandler;
-
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                updateTimestamp(Helper.getRelativeTime(mMessage.getTimetoken() / 10_000L));
-                mBackgroundHandler.postDelayed(this, 1000);
-            }
-        };
-
-        MessageViewHolder(View itemView) {
+        MessageViewHolder(View itemView, int type) {
             super(itemView);
 
             ButterKnife.bind(this, itemView);
 
-            if (useRelativeTimestamps) {
-                mBackgroundHandler = new Handler(mHandlerThread.getLooper());
-            } else {
-                mBackgroundHandler = null;
-            }
+            this.mType = type;
+
         }
 
         void bindData(Message message) {
             this.mMessage = message;
 
+            handleType();
+
             mBubble.setText(mMessage.getText());
+
             mSender.setText(mMessage.getUser().getDisplayName());
-            if (!useRelativeTimestamps) {
-                mTimestamp.setText(mMessage.getTimestamp());
-            }
+
+            mTimestamp.setText(mMessage.getTimestamp());
 
             GlideApp.with(this.itemView)
                     .load(mMessage.getUser().getProfilePictureUrl())
                     .apply(RequestOptions.circleCropTransform())
                     .into(mAvatar);
+
         }
 
-        private void updateTimestamp(String timestamp) {
-            uiHandler.post(() -> mTimestamp.setText(timestamp));
-        }
-
-        void stop() {
-            if (useRelativeTimestamps) {
-                mBackgroundHandler.removeCallbacks(runnable);
+        private void handleType() {
+            switch (mType) {
+                case TYPE_OWN_HEADER:
+                case TYPE_REC_HEADER:
+                    mAvatar.setVisibility(View.VISIBLE);
+                    mSender.setVisibility(View.VISIBLE);
+                    mTimestamp.setVisibility(View.GONE);
+                    break;
+                case TYPE_OWN_MIDDLE:
+                case TYPE_REC_MIDDLE:
+                    mAvatar.setVisibility(View.INVISIBLE);
+                    mSender.setVisibility(View.GONE);
+                    mTimestamp.setVisibility(View.GONE);
+                    break;
+                case TYPE_OWN_END:
+                case TYPE_REC_END:
+                    mAvatar.setVisibility(View.INVISIBLE);
+                    mSender.setVisibility(View.GONE);
+                    mTimestamp.setVisibility(View.VISIBLE);
+                    break;
             }
         }
+    }
 
-        void start() {
-            if (useRelativeTimestamps) {
-                mBackgroundHandler.post(runnable);
-            }
+    class DiffCallback extends DiffUtil.Callback {
+
+        List<Message> newMessages;
+        List<Message> oldMessages;
+
+        DiffCallback(List<Message> newMessages, List<Message> oldMessages) {
+            this.newMessages = newMessages;
+            this.oldMessages = oldMessages;
         }
+
+        @Override
+        public int getOldListSize() {
+            return oldMessages.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+            return newMessages.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int i, int i1) {
+            return oldMessages.get(i).getTimetoken() == newMessages.get(i1).getTimetoken();
+        }
+
+        @Override
+        public boolean areContentsTheSame(int i, int i1) {
+            return oldMessages.get(i).getType() == newMessages.get(i1).getType();
+        }
+
     }
 
     private void showMessageInfoDialog(Context context, Message message) {
@@ -186,6 +223,12 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
         contentBuilder.append(AndroidUtils.newLine());
         contentBuilder.append(AndroidUtils.emphasizeText("Relative: "));
         contentBuilder.append(Helper.getRelativeTime(message.getTimetoken() / 10_000L));
+        contentBuilder.append(AndroidUtils.newLine());
+        contentBuilder.append(AndroidUtils.emphasizeText("Own message: "));
+        contentBuilder.append(message.isOwnMessage());
+        contentBuilder.append(AndroidUtils.newLine());
+        contentBuilder.append(AndroidUtils.emphasizeText("Type: "));
+        contentBuilder.append(message.getType());
 
         MaterialDialog materialDialog = new MaterialDialog.Builder(context)
                 .title(R.string.message_info)

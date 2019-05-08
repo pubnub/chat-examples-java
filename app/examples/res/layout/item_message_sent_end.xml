@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="100dp"
+    android:layout_marginLeft="100dp"
+    android:gravity="end"
+    android:paddingEnd="@dimen/default_spacing"
+    android:paddingRight="@dimen/default_spacing"
+    tools:ignore="RtlSymmetry">
+
+    <ImageView
+        android:id="@+id/message_avatar"
+        android:layout_width="@dimen/avatar_bubble_size"
+        android:layout_height="@dimen/avatar_bubble_size"
+        android:layout_alignTop="@id/message_bubble"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginStart="@dimen/half_spacing"
+        android:layout_marginLeft="@dimen/half_spacing"
+        android:visibility="invisible"
+        tools:src="@drawable/honey_bee" />
+
+    <TextView
+        android:id="@+id/message_sender"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@id/message_bubble"
+        android:layout_alignRight="@id/message_bubble"
+        android:textColor="@color/message_metadata_user"
+        android:textSize="@dimen/message_metadata_text_size"
+        android:textStyle="bold"
+        android:visibility="gone"
+        tools:text="Monty the monkey" />
+
+    <TextView
+        android:id="@+id/message_bubble"
+        style="@style/MessageBubble"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/message_sender"
+        android:layout_toStartOf="@id/message_avatar"
+        android:layout_toLeftOf="@id/message_avatar"
+        android:background="@drawable/message_sent_bubble"
+        android:textColor="@color/message_sent_text"
+        tools:text="@string/lorem_ipsum_short" />
+
+    <TextView
+        android:id="@+id/message_timestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/message_bubble"
+        android:layout_alignEnd="@id/message_bubble"
+        android:layout_alignRight="@id/message_bubble"
+        android:textColor="@color/message_metadata_timestamp"
+        android:textSize="@dimen/message_metadata_text_size"
+        android:visibility="visible"
+        tools:text="7:22 PM" />
+
+</RelativeLayout>

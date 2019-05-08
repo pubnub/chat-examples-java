@@ -2,6 +2,7 @@ package resourcecenterdemo.fragments;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -35,6 +36,7 @@ import resourcecenterdemo.R;
 import resourcecenterdemo.adapters.ChatAdapter;
 import resourcecenterdemo.pubnub.History;
 import resourcecenterdemo.pubnub.Message;
+import resourcecenterdemo.util.Helper;
 import resourcecenterdemo.view.EmptyView;
 import resourcecenterdemo.view.MessageComposer;
 
@@ -54,15 +56,13 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
     @BindView(R.id.chat_empty_view)
     EmptyView mEmptyView;
 
-    ChatAdapter mChatAdapter;
-    List<Message> mMessages = new ArrayList<>();
+    private ChatAdapter mChatAdapter;
+    private List<Message> mMessages = new ArrayList<>();
 
     private String mChannel;
     private SubscribeCallback mPubNubListener;
 
     private RecyclerView.OnScrollListener mOnScrollListener;
-    private int topItemOffset = 3;
-    private int historyChunkSize = 20;
 
     public static ChatFragment newInstance(String channel) {
         Bundle args = new Bundle();
@@ -79,13 +79,10 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
 
     @Override
     public void setViewBehaviour(boolean viewFromCache) {
-        setHasOptionsMenu(true);
-
-        initializeScrollListener();
-
-        prepareRecyclerView();
-
         if (!viewFromCache) {
+            setHasOptionsMenu(true);
+            initializeScrollListener();
+            prepareRecyclerView();
             mSwipeRefreshLayout.setRefreshing(true);
             subscribe();
             fetchHistory();
@@ -108,7 +105,7 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
 
         mChatsRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        mChatAdapter = new ChatAdapter(mChannel, mMessages);
+        mChatAdapter = new ChatAdapter(mChannel);
         mChatsRecyclerView.setAdapter(mChatAdapter);
 
         mMessageComposer.setListener(this);
@@ -124,7 +121,7 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
                 int firstCompletelyVisibleItemPosition =
                         ((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
 
-                if (firstCompletelyVisibleItemPosition == topItemOffset && dy < 0) {
+                if (firstCompletelyVisibleItemPosition == History.TOP_ITEM_OFFSET && dy < 0) {
                     fetchHistory();
                 }
             }
@@ -210,11 +207,12 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
         if (message.getChannel().equals(mChannel)) {
             Message msg = Message.serialize(message);
             mMessages.add(msg);
+            History.chainMessages(mMessages, mMessages.size());
             runOnUiThread(() -> {
                 if (mEmptyView.getVisibility() == View.VISIBLE) {
                     mEmptyView.setVisibility(View.GONE);
                 }
-                mChatAdapter.notifyItemInserted(mChatAdapter.getItemCount());
+                mChatAdapter.update(mMessages);
                 scrollChatToBottom();
             });
         }
@@ -229,24 +227,31 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
     }
 
     private void fetchHistory() {
+        if (History.isLoading()) {
+            return;
+        }
+        History.setLoading(true);
         mSwipeRefreshLayout.setRefreshing(true);
-        History.getAllMessages(hostActivity.getPubNub(), mChannel, getEarliestTimestamp(), historyChunkSize,
+        History.getAllMessages(hostActivity.getPubNub(), mChannel, getEarliestTimestamp(),
                 new History.CallbackSkeleton() {
                     @Override
-                    public void handleResponse(List<Message> messages) {
+                    public void handleResponse(List<Message> newMessages) {
+                        if (!newMessages.isEmpty()) {
+                            mMessages.addAll(0, newMessages);
+                            History.chainMessages(mMessages, mMessages.size());
+                            runOnUiThread(() -> mChatAdapter.update(mMessages));
+                        } else if (mMessages.isEmpty()) {
+                            runOnUiThread(() -> mEmptyView.setVisibility(View.VISIBLE));
+                        } else {
+                            runOnUiThread(() -> Toast.makeText(fragmentContext, getString(R.string.no_more_messages),
+                                    Toast.LENGTH_SHORT)
+                                    .show());
+                        }
                         runOnUiThread(() -> {
                             mSwipeRefreshLayout.setRefreshing(false);
-                            if (!messages.isEmpty()) {
-                                mMessages.addAll(0, messages);
-                                mChatAdapter.notifyItemRangeInserted(0, messages.size());
-                            } else if (mMessages.isEmpty()) {
-                                mEmptyView.setVisibility(View.VISIBLE);
-                            } else {
-                                Toast.makeText(fragmentContext, getString(R.string.no_more_messages),
-                                        Toast.LENGTH_SHORT)
-                                        .show();
-                            }
+                            Log.d("new_arrival", "size: " + mMessages.size());
                         });
+                        History.setLoading(false);
                     }
                 });
     }
@@ -267,13 +272,17 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
     @Override
     public void onSentClick(String message) {
         if (TextUtils.isEmpty(message)) {
-            message = UUID.randomUUID().toString();
+            StringBuilder messageBuilder = new StringBuilder("");
+            messageBuilder.append(UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+            messageBuilder.append("\n");
+            messageBuilder.append(Helper.parseDateTime(System.currentTimeMillis()));
+            message = messageBuilder.toString();
         }
         hostActivity.getPubNub()
                 .publish()
                 .channel(mChannel)
                 .shouldStore(true)
-                .message(Message.newBuilder().text(message).build().generate())
+                .message(Message.newBuilder().text(message).build())
                 .async(new PNCallback<PNPublishResult>() {
                     @Override
                     public void onResponse(PNPublishResult result, PNStatus status) {

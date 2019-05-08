@@ -2,8 +2,10 @@ package resourcecenterdemo.fragments;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.request.RequestOptions;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
@@ -26,14 +28,15 @@ import resourcecenterdemo.R;
 import resourcecenterdemo.adapters.UserAdapter;
 import resourcecenterdemo.model.Users;
 import resourcecenterdemo.pubnub.User;
+import resourcecenterdemo.util.GlideApp;
 import resourcecenterdemo.view.EmptyView;
 
 public class ChatInfoFragment extends ParentFragment {
 
     private static final String ARGS_CHANNEL = "ARGS_CHANNEL";
 
-    @BindView(R.id.info_channel)
-    TextView mChannelName;
+    @BindView(R.id.info_image)
+    ImageView mImage;
 
     @BindView(R.id.info_description)
     TextView mDescription;
@@ -67,10 +70,13 @@ public class ChatInfoFragment extends ParentFragment {
     public void setViewBehaviour(boolean viewFromCache) {
         mUsersRecyclerView.setLayoutManager(new LinearLayoutManager(fragmentContext));
         mUsersRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mUserAdapter = new UserAdapter(mChannel, mUsers);
+        mUserAdapter = new UserAdapter(mChannel);
         mUsersRecyclerView.setAdapter(mUserAdapter);
-        mChannelName.setText(mChannel);
-        mDescription.setText(R.string.lorem_ipsum_long);
+
+        GlideApp.with(fragmentContext)
+                .load(R.drawable.chat_logo)
+                .apply(RequestOptions.circleCropTransform())
+                .into(mImage);
 
         fetchAvailableUsers();
     }
@@ -130,7 +136,7 @@ public class ChatInfoFragment extends ParentFragment {
 
                 handleUiVisibility();
 
-                runOnUiThread(() -> mUserAdapter.notifyDataSetChanged());
+                runOnUiThread(() -> mUserAdapter.update(mUsers));
             }
         };
     }
@@ -175,8 +181,7 @@ public class ChatInfoFragment extends ParentFragment {
                                         .user(Users.getUserById(occupant.getUuid()))
                                         .build());
                             }
-                            mUserAdapter.notifyDataSetChanged();
-                            /*mUserAdapter.notifyItemRangeChanged(0, mUsers.size());*/
+                            mUserAdapter.update(mUsers);
 
                         }
                     }

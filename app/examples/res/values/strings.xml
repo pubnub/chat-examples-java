@@ -18,4 +18,5 @@
     <string name="no_messages">There are no messages!</string>
     <string name="no_members">There are no members!</string>
     <string name="you">You</string>
+    <string name="chat_description">A chat group to talk to all your fuzzy friends in the animal kingdom.</string>
 </resources>

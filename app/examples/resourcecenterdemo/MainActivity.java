@@ -28,16 +28,15 @@ public class MainActivity extends ParentActivity implements ParentActivityImpl {
 
     private PubNub mPubNub;
 
-    final String channel = "demo-animal-forest";
-    final String historyChannel = "much_history";
-    final String spareChannel = "apr19mo";
+    // final String channel = "Animal Forest";
+    final String channel = "may8mo";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setSupportActionBar(mToolbar);
         initializePubNub();
-        addFragment(ChatFragment.newInstance(spareChannel));
+        addFragment(ChatFragment.newInstance(channel));
     }
 
     @Override
@@ -46,18 +45,18 @@ public class MainActivity extends ParentActivity implements ParentActivityImpl {
     }
 
     private void initializePubNub() {
-        PNConfiguration pnConfiguration = new PNConfiguration();
-        pnConfiguration.setPublishKey(BuildConfig.PUB_KEY);
-        pnConfiguration.setSubscribeKey(BuildConfig.SUB_KEY);
-        pnConfiguration.setUuid(Prefs.get().uuid());
-        pnConfiguration.setLogVerbosity(PNLogVerbosity.BODY);
-        pnConfiguration.setReconnectionPolicy(PNReconnectionPolicy.LINEAR);
-        mPubNub = new PubNub(pnConfiguration);
-
         // tag::KEYS-2[]
         String pubKey = BuildConfig.PUB_KEY;
         String subKey = BuildConfig.SUB_KEY;
         // end::KEYS-2[]
+
+        PNConfiguration pnConfiguration = new PNConfiguration();
+        pnConfiguration.setPublishKey(pubKey);
+        pnConfiguration.setSubscribeKey(subKey);
+        pnConfiguration.setUuid(Prefs.get().uuid());
+        pnConfiguration.setLogVerbosity(PNLogVerbosity.BODY);
+        pnConfiguration.setReconnectionPolicy(PNReconnectionPolicy.LINEAR);
+        mPubNub = new PubNub(pnConfiguration);
     }
 
     @Override
@@ -90,11 +89,9 @@ public class MainActivity extends ParentActivity implements ParentActivityImpl {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // handle arrow click here
         if (item.getItemId() == android.R.id.home) {
             backPress();
         }
-
         return super.onOptionsItemSelected(item);
     }
 
