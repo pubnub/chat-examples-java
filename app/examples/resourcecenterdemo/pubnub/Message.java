@@ -8,35 +8,41 @@ import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
 
 import resourcecenterdemo.model.Users;
 import resourcecenterdemo.prefs.Prefs;
+import resourcecenterdemo.util.ChatItem;
 import resourcecenterdemo.util.Helper;
 
-public class Message {
+public class Message extends ChatItem {
 
-    String senderId, text;
+    private final long TIMESTAMP_DIVIDER = 10_000L;
 
-    transient String timestamp;
-    transient long timetoken;
-    transient boolean isOwnMessage;
+    private String senderId, text;
 
-    transient Users.User user;
+    private transient String timestamp;
+    private transient long timetoken;
+    private transient boolean ownMessage;
+    private transient int type;
 
+    /**
+     * Key for grouping messages by their timetoken.
+     */
+    private transient Long key;
+
+    /**
+     * Message owner.
+     */
+    private transient Users.User user;
+
+    /**
+     * Disable instance creation via constructor.
+     * Use the {@code newBuilder} method instead.
+     */
     private Message() {
 
     }
 
-    private Message(Builder builder) {
-        senderId = Prefs.get().uuid();
-        text = builder.text;
-        timetoken = builder.timetoken;
-        initializeCustomProperties();
-    }
-
-    private void initializeCustomProperties() {
-        isOwnMessage = Prefs.get().uuid().equals(senderId);
-        timestamp = Helper.parseTime(timetoken / 10_000L);
-        user = Users.getUserById(senderId);
-    }
-
+    /**
+     * Adopts the builder pattern and it's used to create instances.
+     */
     public static final class Builder {
 
         private String text;
@@ -55,8 +61,8 @@ public class Message {
             return this;
         }
 
-        public Message build() {
-            return new Message(this);
+        public JsonObject build() {
+            return new Message(this).generate();
         }
     }
 
@@ -64,7 +70,31 @@ public class Message {
         return new Builder();
     }
 
-    public static Message serialize(PNHistoryItemResult pnHistoryItemResult) {
+    private Message(Builder builder) {
+        senderId = Prefs.get().uuid();
+        text = builder.text;
+        timetoken = builder.timetoken;
+        initializeCustomProperties();
+    }
+
+    private void initializeCustomProperties() {
+        ownMessage = Prefs.get().uuid().equals(senderId);
+        timestamp = Helper.parseTime(timetoken / TIMESTAMP_DIVIDER);
+        user = Users.getUserById(senderId);
+        key = Helper.trimTime(timetoken / TIMESTAMP_DIVIDER);
+        type = ownMessage ? TYPE_OWN_HEADER : TYPE_REC_HEADER;
+    }
+
+    @Override
+    public int getType() {
+        return type;
+    }
+
+    void setType(int type) {
+        this.type = type;
+    }
+
+    static Message serialize(PNHistoryItemResult pnHistoryItemResult) {
         Message message = new Gson().fromJson(pnHistoryItemResult.getEntry(), Message.class);
         message.timetoken = pnHistoryItemResult.getTimetoken();
         message.initializeCustomProperties();
@@ -78,10 +108,11 @@ public class Message {
         return message;
     }
 
-    public JsonObject generate() {
+    private JsonObject generate() {
         String json = new Gson().toJson(this);
         JsonObject payload = new JsonParser().parse(json).getAsJsonObject();
         if (timetoken != 0L) {
+            // if editing an existing message, pass it's timetoken within the payload
             payload.addProperty("timetoken", timetoken);
         }
         return payload;
@@ -104,10 +135,15 @@ public class Message {
     }
 
     public boolean isOwnMessage() {
-        return isOwnMessage;
+        return ownMessage;
     }
 
     public Users.User getUser() {
         return user;
     }
+
+    public Long getKey() {
+        return key;
+    }
+
 }

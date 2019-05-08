@@ -8,9 +8,12 @@ import android.widget.TextView;
 
 import com.bumptech.glide.request.RequestOptions;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -25,9 +28,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
     private List<User> mItems;
 
-    public UserAdapter(String channel, List<User> items) {
+    public UserAdapter(String channel) {
         mChannel = channel;
-        mItems = items;
+        mItems = new ArrayList<>();
     }
 
     @NonNull
@@ -46,6 +49,14 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     @Override
     public int getItemCount() {
         return mItems.size();
+    }
+
+    public void update(List<User> newData) {
+        Collections.sort(newData, (o1, o2) -> Boolean.compare(o1.isMe(), o2.isMe()) * (-1));
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallback(newData, mItems));
+        diffResult.dispatchUpdatesTo(this);
+        mItems.clear();
+        mItems.addAll(newData);
     }
 
     class UserViewHolder extends RecyclerView.ViewHolder {
@@ -74,19 +85,45 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         void bindData(User user) {
             this.mUser = user;
 
-            mUsername.setText(this.mUser.getUser().getDisplayName());
-            if (this.mUser.isMe()) {
-                mStatus.setText(R.string.you);
-                mStatus.setTextColor(mStatus.getResources().getColor(R.color.colorPrimary));
-            } else {
-                mStatus.setText(this.mUser.getUser().getDesignation());
-                mStatus.setTextColor(mStatus.getResources().getColor(R.color.text_secondary));
-            }
+            mUsername.setText(this.mUser.getDisplayName());
+            mStatus.setText(this.mUser.getUser().getDesignation());
 
             GlideApp.with(this.itemView)
                     .load(user.getUser().getProfilePictureUrl())
                     .apply(RequestOptions.circleCropTransform())
                     .into(mAvatar);
         }
+    }
+
+    class DiffCallback extends DiffUtil.Callback {
+
+        List<User> newUsers;
+        List<User> oldUsers;
+
+        public DiffCallback(List<User> newChats, List<User> oldChats) {
+            this.newUsers = newChats;
+            this.oldUsers = oldChats;
+        }
+
+        @Override
+        public int getOldListSize() {
+            return oldUsers.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+            return newUsers.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int i, int i1) {
+            return oldUsers.get(i).equals(newUsers.get(i1));
+        }
+
+        @Override
+        public boolean areContentsTheSame(int i, int i1) {
+            return areItemsTheSame(i, i1);
+        }
+
     }
 }

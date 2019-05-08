@@ -23,7 +23,7 @@ abstract class ParentFragment extends Fragment implements PNFragment {
     Context fragmentContext;
     private Unbinder mUnbinder;
     private boolean mIsFromCache;
-    private boolean mRestored;
+    private View rootView;
 
     public abstract int provideLayoutResourceId();
 
@@ -43,17 +43,21 @@ abstract class ParentFragment extends Fragment implements PNFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle
             savedInstanceState) {
         Log.d(TAG, "onCreateView");
-        View view;
-        if (getView() != null) {
-            view = getView();
+        if (rootView != null) {
             mIsFromCache = true;
+            return rootView;
         } else {
-            view = inflater.inflate(provideLayoutResourceId(), container, false);
-            mIsFromCache = false;
+            rootView = getView();
+            if (rootView == null) {
+                rootView = inflater.inflate(provideLayoutResourceId(), container, false);
+                mUnbinder = ButterKnife.bind(this, rootView);
+                mIsFromCache = false;
+            } else {
+                mIsFromCache = true;
+            }
         }
-        mUnbinder = ButterKnife.bind(this, view);
         Log.d(TAG, "onCreateView " + mIsFromCache);
-        return view;
+        return rootView;
     }
 
     @Override
@@ -61,7 +65,7 @@ abstract class ParentFragment extends Fragment implements PNFragment {
         Log.d(TAG, "onViewCreated");
         super.onViewCreated(view, savedInstanceState);
         Log.d(TAG, "setViewBehaviour, cache: " + mIsFromCache);
-        setViewBehaviour(mRestored);
+        setViewBehaviour(mIsFromCache);
     }
 
     @Override
@@ -75,7 +79,6 @@ abstract class ParentFragment extends Fragment implements PNFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
-        mRestored = false;
         Log.d(TAG, "onReady");
         onReady();
         hostActivity.getPubNub().addListener(provideListener());
@@ -96,6 +99,7 @@ abstract class ParentFragment extends Fragment implements PNFragment {
     public void onDetach() {
         Log.d(TAG, "onDetach");
         this.fragmentContext = null;
+        this.rootView = null;
         super.onDetach();
     }
 
@@ -115,7 +119,6 @@ abstract class ParentFragment extends Fragment implements PNFragment {
     @Override
     public void onDestroyView() {
         Log.d(TAG, "onDestroyView");
-        mRestored = true;
         super.onDestroyView();
     }
 

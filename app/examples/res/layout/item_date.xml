@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/item_date"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#FFD600"
+    android:gravity="center"
+    android:padding="@dimen/half_spacing"
+    tools:text="24 4 2011" />

@@ -21,6 +21,18 @@
         <item>Baby</item>
         <item>Wild</item>
         <item>Safari</item>
+        <item>Honey</item>
+        <item>Angry</item>
+        <item>Mountain</item>
+        <item>Scary</item>
+        <item>Greenland</item>
+        <item>Crazy</item>
+        <item>Black</item>
+        <item>Red</item>
+        <item>Bamboo</item>
+        <item>Cuddle</item>
+        <item>Fast</item>
+        <item>Brown</item>
     </string-array>
 
     <string-array name="last_names">
@@ -44,6 +56,18 @@
         <item>Deer</item>
         <item>Eagle</item>
         <item>Camel</item>
+        <item>Bee</item>
+        <item>Crocodile</item>
+        <item>Kangaroo</item>
+        <item>Snake</item>
+        <item>Reindeer</item>
+        <item>Frog</item>
+        <item>Pig</item>
+        <item>Fox</item>
+        <item>Panda</item>
+        <item>Koala</item>
+        <item>Ostrich</item>
+        <item>Meerkat</item>
     </string-array>
 
     <string-array name="designations">
@@ -66,6 +90,18 @@
         <item>CEO</item>
         <item>Marketing Specialist</item>
         <item>Support Rep</item>
+        <item>Solution Architect</item>
+        <item>Co-Founder</item>
+        <item>Solution Architect</item>
+        <item>Product Manager</item>
+        <item>Engineer</item>
+        <item>Technician</item>
+        <item>Receptionist</item>
+        <item>Account Manager</item>
+        <item>Support Rep</item>
+        <item>Dev-Ops Engineer</item>
+        <item>Network Engineer</item>
+        <item>Technician</item>
         <item>Solution Architect</item>
     </string-array>
 
@@ -90,5 +126,17 @@
         <item>@drawable/baby_deer</item>
         <item>@drawable/wild_eagle</item>
         <item>@drawable/safari_camel</item>
+        <item>@drawable/honey_bee</item>
+        <item>@drawable/angry_crocodile</item>
+        <item>@drawable/mountain_kangaroo</item>
+        <item>@drawable/scary_snake</item>
+        <item>@drawable/greenland_reindeer</item>
+        <item>@drawable/crazy_frog</item>
+        <item>@drawable/black_pig</item>
+        <item>@drawable/red_fox</item>
+        <item>@drawable/bamboo_panda</item>
+        <item>@drawable/cuddly_koala</item>
+        <item>@drawable/fast_ostrich</item>
+        <item>@drawable/brown_meerkat</item>
     </array>
 </resources>

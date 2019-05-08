@@ -4,7 +4,7 @@
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/message_composer">
+    android:background="@drawable/message_composer_bg">
 
     <EditText
         android:id="@+id/composer_edittext"
@@ -35,10 +35,10 @@
             android:layout_height="56dp"
             android:background="?selectableItemBackgroundBorderless"
             android:clickable="true"
-            android:focusable="true"
-            android:visibility="gone"
-            android:scaleType="centerInside"
             android:contentDescription="@string/attach"
+            android:focusable="true"
+            android:scaleType="centerInside"
+            android:visibility="gone"
             app:srcCompat="@drawable/ic_attachment" />
 
         <ImageView
@@ -47,10 +47,10 @@
             android:layout_height="56dp"
             android:background="?selectableItemBackgroundBorderless"
             android:clickable="true"
+            android:contentDescription="@string/send"
             android:focusable="true"
             android:scaleType="centerInside"
-            app:srcCompat="@drawable/ic_send"
-            android:contentDescription="@string/send" />
+            app:srcCompat="@drawable/ic_send" />
     </LinearLayout>
 
 </RelativeLayout>
