@@ -21,7 +21,7 @@ let changeEnd = null;
 let changeLog = null;
 
 // Examples location.
-const samplesPath = [currentRepositoryPath, 'app', 'examples'].join('/');
+const examplesPath = [currentRepositoryPath, 'app', 'examples'].join('/');
 
 // Samples location.
 const samplesPath = [currentRepositoryPath, 'app', 'snippets'].join('/');
