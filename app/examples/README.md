@@ -1,4 +1,4 @@
-Animal Forest Chat Application
+## Animal Forest Chat Application
 
 Follow build instructions in [this README.md](https://github.com/pubnub/chat-examples-java/blob/master/README.md).
 
