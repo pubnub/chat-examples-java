@@ -47,6 +47,20 @@ android {
             java.srcDirs = ["$snippetsPath"]
         }
     }
+
+    android.applicationVariants.all { variant ->
+        variant.outputs.all {
+            def project = "ChatExamples"
+            def SEP = "_"
+            def buildType = variant.variantData.variantConfiguration.buildType.name
+            def versionName = variant.versionName
+            def versionCode = variant.versionCode
+            def date = new Date()
+            def formattedDate = date.format("ddMMyyyyHHmm")
+            def newApkName = project + SEP + buildType + SEP + versionName + SEP + "rev" + versionCode + SEP + formattedDate + ".apk"
+            outputFileName = newApkName
+        }
+    }
 }
 
 checkstyle {
@@ -73,7 +87,7 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.0.0'
 
     // tag::DEP-1[]
-    implementation 'com.pubnub:pubnub-gson:4.22.0-beta'
+    implementation 'com.pubnub:pubnub-gson:4.23.0'
     // end::DEP-1[]
 
     api 'com.google.guava:guava:27.1-android'

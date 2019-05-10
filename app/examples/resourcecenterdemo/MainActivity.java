@@ -18,6 +18,16 @@ import resourcecenterdemo.fragments.ChatFragment;
 import resourcecenterdemo.prefs.Prefs;
 import resourcecenterdemo.util.ParentActivityImpl;
 
+// tag::INIT-3.1[]
+// tag::ignore[]
+/*
+// end::ignore[]
+public class MainActivity extends ParentActivity implements ParentActivityImpl {
+// tag::ignore[]
+*/
+// end::ignore[]
+// end::INIT-3.1[]
+
 public class MainActivity extends ParentActivity implements ParentActivityImpl {
 
     @BindView(R.id.toolbar)
@@ -26,18 +36,24 @@ public class MainActivity extends ParentActivity implements ParentActivityImpl {
     @BindView(R.id.container)
     FrameLayout mFragmentContainer;
 
-    private PubNub mPubNub;
+    // tag::INIT-1.1[]
+    private PubNub mPubNub; // a field of MainActivity.java
+    // end::INIT-1.1[]
 
-    // final String channel = "Animal Forest";
-    final String channel = "may8mo";
+    final String channel = "demo-animal-forest";
 
+    // tag::INIT-3.2[]
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // ...
+        // tag::ignore[]
         setSupportActionBar(mToolbar);
         initializePubNub();
         addFragment(ChatFragment.newInstance(channel));
+        // end::ignore[]
     }
+    // end::INIT-3.2[]
 
     @Override
     protected int provideLayoutResourceId() {
@@ -50,19 +66,25 @@ public class MainActivity extends ParentActivity implements ParentActivityImpl {
         String subKey = BuildConfig.SUB_KEY;
         // end::KEYS-2[]
 
+        // tag::INIT-1.2[]
         PNConfiguration pnConfiguration = new PNConfiguration();
         pnConfiguration.setPublishKey(pubKey);
         pnConfiguration.setSubscribeKey(subKey);
-        pnConfiguration.setUuid(Prefs.get().uuid());
+        pnConfiguration.setUuid(Prefs.get().uuid()); // uuid is stored in SharedPreferences
         pnConfiguration.setLogVerbosity(PNLogVerbosity.BODY);
         pnConfiguration.setReconnectionPolicy(PNReconnectionPolicy.LINEAR);
+        pnConfiguration.setMaximumReconnectionRetries(10);
+
         mPubNub = new PubNub(pnConfiguration);
+        // end::INIT-1.2[]
     }
 
+    // tag::INIT-3.3[]
     @Override
     public PubNub getPubNub() {
         return mPubNub;
     }
+    // end::INIT-3.3[]
 
     @Override
     public void setTitle(String title) {
@@ -109,10 +131,14 @@ public class MainActivity extends ParentActivity implements ParentActivityImpl {
         }
     }
 
+    // tag::INIT-4[]
     @Override
     protected void onDestroy() {
-        getPubNub().unsubscribeAll();
-        getPubNub().forceDestroy();
+        mPubNub.unsubscribeAll();
+        mPubNub.forceDestroy();
         super.onDestroy();
     }
+    // end::INIT-4[]
+    // tag::INIT-3.4[]
 }
+// end::INIT-3.4[]

@@ -22,7 +22,7 @@ public class MessageHelper {
 
         long diffToPrev = (currentMsg.getTimetoken() - previousMsg.getTimetoken()) / 10_000L;
 
-        long offset = TimeUnit.SECONDS.toMillis(2);
+        long offset = TimeUnit.MINUTES.toMillis(1);
 
         boolean ownMessage = previousMsg.getUser().getUuid().equals(currentMsg.getUser().getUuid());
         boolean chainable = false;

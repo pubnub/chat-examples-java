@@ -11,15 +11,25 @@ import resourcecenterdemo.prefs.Prefs;
 import resourcecenterdemo.util.ChatItem;
 import resourcecenterdemo.util.Helper;
 
+// end::BIND-3[]
 public class Message extends ChatItem {
 
     private final long TIMESTAMP_DIVIDER = 10_000L;
 
     private String senderId, text;
 
+    /**
+     * Formatted timestamp
+     */
     private transient String timestamp;
+
     private transient long timetoken;
+
     private transient boolean ownMessage;
+
+    /**
+     * On of the six possible view types
+     */
     private transient int type;
 
     /**
@@ -31,6 +41,15 @@ public class Message extends ChatItem {
      * Message owner.
      */
     private transient Users.User user;
+
+    // tag::ignore[]
+/*
+// end::ignore[]
+}
+// tag::ignore[]
+*/
+    // end::ignore[]
+    // end::BIND-3[]
 
     /**
      * Disable instance creation via constructor.

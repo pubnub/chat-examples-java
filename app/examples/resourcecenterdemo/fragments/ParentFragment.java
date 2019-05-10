@@ -13,10 +13,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import resourcecenterdemo.util.PNFragment;
+import resourcecenterdemo.util.PNFragmentImpl;
 import resourcecenterdemo.util.ParentActivityImpl;
 
-abstract class ParentFragment extends Fragment implements PNFragment {
+abstract class ParentFragment extends Fragment implements PNFragmentImpl {
 
     private final String TAG = "PF_" + getClass().getSimpleName();
 
@@ -36,7 +36,9 @@ abstract class ParentFragment extends Fragment implements PNFragment {
     public void extractArguments() {
     }
 
-    ParentActivityImpl hostActivity;
+    // tag::FRG-1.1[]
+    ParentActivityImpl hostActivity; // field of fragment
+    // end::FRG-1.1[]
 
     @Nullable
     @Override
@@ -75,25 +77,39 @@ abstract class ParentFragment extends Fragment implements PNFragment {
         hostActivity.setTitle(setScreenTitle());
     }
 
+    // tag::FRG-5.1[]
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
+        // tag::ignore[]
         Log.d(TAG, "onCreate");
+        // end::ignore[]
         super.onCreate(savedInstanceState);
+        // tag::ignore[]
         Log.d(TAG, "onReady");
         onReady();
+        // end::ignore[]
         hostActivity.getPubNub().addListener(provideListener());
+        // tag::ignore[]
         if (getArguments() != null) {
             extractArguments();
         }
+        // end::ignore[]
     }
+    // end::FRG-5.1[]
 
+    // tag::FRG-1.2[]
     @Override
     public void onAttach(Context context) {
+        // tag::ignore[]
         Log.d(TAG, "onAttach");
+        // end::ignore[]
         super.onAttach(context);
+        // tag::ignore[]
         this.fragmentContext = context;
+        // end::ignore[]
         this.hostActivity = (ParentActivityImpl) context;
     }
+    // end::FRG-1.2[]
 
     @Override
     public void onDetach() {
@@ -103,12 +119,16 @@ abstract class ParentFragment extends Fragment implements PNFragment {
         super.onDetach();
     }
 
+    // tag::FRG-5.2[]
     @Override
     public void onDestroy() {
+        // tag::ignore[]
         Log.d(TAG, "onDestroy");
+        // end::ignore[]
         hostActivity.getPubNub().removeListener(provideListener());
         super.onDestroy();
     }
+    // end::FRG-5.2[]
 
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {

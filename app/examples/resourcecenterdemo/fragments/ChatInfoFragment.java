@@ -51,7 +51,10 @@ public class ChatInfoFragment extends ParentFragment {
     List<User> mUsers = new ArrayList<>();
 
     private String mChannel;
-    private SubscribeCallback mPubNubListener;
+
+    // tag::FRG-4.1[]
+    private SubscribeCallback mPubNubListener; // field of Fragment
+    // end::FRG-4.1[]
 
     static ChatInfoFragment newInstance(String channel) {
         Bundle args = new Bundle();
@@ -93,6 +96,7 @@ public class ChatInfoFragment extends ParentFragment {
     }
 
     private void initListener() {
+        // tag::FRG-4.2[]
         mPubNubListener = new SubscribeCallback() {
             @Override
             public void status(PubNub pubnub, PNStatus status) {
@@ -107,6 +111,7 @@ public class ChatInfoFragment extends ParentFragment {
             @Override
             public void presence(PubNub pubnub, PNPresenceEventResult presence) {
 
+                // tag::ignore[]
                 if (presence.getUuid() == null) {
                     return;
                 }
@@ -137,8 +142,10 @@ public class ChatInfoFragment extends ParentFragment {
                 handleUiVisibility();
 
                 runOnUiThread(() -> mUserAdapter.update(mUsers));
+                // end::ignore[]
             }
         };
+        // end::FRG-4.2[]
     }
 
     private void handleUiVisibility() {
@@ -188,9 +195,11 @@ public class ChatInfoFragment extends ParentFragment {
                 });
     }
 
+    // tag::FRG-4.3[]
     @Override
     public SubscribeCallback provideListener() {
         return mPubNubListener;
     }
+    // end::FRG-4.3[]
 
 }

@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class History {
 
-    public static final int TOP_ITEM_OFFSET = 1;
+    public static final int TOP_ITEM_OFFSET = 3;
     private static final int CHUNK_SIZE = 20;
     private static final AtomicBoolean LOADING = new AtomicBoolean(false);
 
@@ -24,6 +24,7 @@ public class History {
         public abstract void handleResponse(List<Message> messages);
     }
 
+    // tag::HIS-2[]
     public static void getAllMessages(PubNub pubNub, final String channel, Long start,
                                       final CallbackSkeleton callback) {
         pubNub.history()
@@ -50,7 +51,9 @@ public class History {
                     }
                 });
     }
+    // end::HIS-2[]
 
+    // end::HIS-3[]
     public static void chainMessages(List<Message> list, int count) {
 
         int limit = count;
@@ -65,6 +68,7 @@ public class History {
             }
         }
     }
+    // end::HIS-3[]
 
     public static boolean isLoading() {
         return LOADING.get();

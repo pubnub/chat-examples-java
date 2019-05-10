@@ -48,7 +48,9 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
     SwipeRefreshLayout mSwipeRefreshLayout;
 
     @BindView(R.id.chat_recycler_view)
-    RecyclerView mChatsRecyclerView;
+    // tag::HIS-4.1[]
+            RecyclerView mChatsRecyclerView;
+    // tag::HIS-4.1[]
 
     @BindView(R.id.chats_message_composer)
     MessageComposer mMessageComposer;
@@ -56,8 +58,10 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
     @BindView(R.id.chat_empty_view)
     EmptyView mEmptyView;
 
+    // tag::HIS-4.2[]
     private ChatAdapter mChatAdapter;
     private List<Message> mMessages = new ArrayList<>();
+    // end::HIS-4.2[]
 
     private String mChannel;
     private SubscribeCallback mPubNubListener;
@@ -85,7 +89,6 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
             prepareRecyclerView();
             mSwipeRefreshLayout.setRefreshing(true);
             subscribe();
-            fetchHistory();
         }
     }
 
@@ -161,8 +164,19 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
     @Override
     public void onReady() {
         initListener();
+
+        // tag::FRG-2[]
+        // tag::ignore[]
+        /*
+        // end::ignore[]
+        hostActivity.getPubNub();
+        // tag::ignore[]
+        */
+        // end::ignore[]
+        // end::FRG-2[]
     }
 
+    // tag::SUB-2[]
     private void initListener() {
         mPubNubListener = new SubscribeCallback() {
             @Override
@@ -170,6 +184,7 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
                 if (status.getOperation() == PNOperationType.PNSubscribeOperation && status.getAffectedChannels()
                         .contains(mChannel)) {
                     mSwipeRefreshLayout.setRefreshing(false);
+                    fetchHistory();
                 }
             }
 
@@ -187,6 +202,7 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
             }
         };
     }
+    // end::SUB-2[]
 
     private void loadCurrentOccupancy() {
         hostActivity.getPubNub()
@@ -218,6 +234,7 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
         }
     }
 
+    // tag::SUB-1[]
     private void subscribe() {
         hostActivity.getPubNub()
                 .subscribe()
@@ -225,7 +242,9 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
                 .withPresence()
                 .execute();
     }
+    // end::SUB-1[]
 
+    // tag::HIS-1[]
     private void fetchHistory() {
         if (History.isLoading()) {
             return;
@@ -244,8 +263,7 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
                             runOnUiThread(() -> mEmptyView.setVisibility(View.VISIBLE));
                         } else {
                             runOnUiThread(() -> Toast.makeText(fragmentContext, getString(R.string.no_more_messages),
-                                    Toast.LENGTH_SHORT)
-                                    .show());
+                                    Toast.LENGTH_SHORT).show());
                         }
                         runOnUiThread(() -> {
                             mSwipeRefreshLayout.setRefreshing(false);
@@ -255,6 +273,7 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
                     }
                 });
     }
+    // end::HIS-1[]
 
     private Long getEarliestTimestamp() {
         if (mMessages != null && !mMessages.isEmpty()) {
@@ -269,8 +288,10 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
         super.onDestroy();
     }
 
+    // tag::SEND-2[]
     @Override
     public void onSentClick(String message) {
+        // tag::ignore[]
         if (TextUtils.isEmpty(message)) {
             StringBuilder messageBuilder = new StringBuilder("");
             messageBuilder.append(UUID.randomUUID().toString().substring(0, 8).toUpperCase());
@@ -278,6 +299,7 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
             messageBuilder.append(Helper.parseDateTime(System.currentTimeMillis()));
             message = messageBuilder.toString();
         }
+        // end::ignore[]
         hostActivity.getPubNub()
                 .publish()
                 .channel(mChannel)
@@ -286,12 +308,11 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
                 .async(new PNCallback<PNPublishResult>() {
                     @Override
                     public void onResponse(PNPublishResult result, PNStatus status) {
-                        if (!status.isError()) {
 
-                        }
                     }
                 });
     }
+    // end::SEND-2[]
 
     private void scrollChatToBottom() {
         mChatsRecyclerView.scrollToPosition(mMessages.size() - 1);
