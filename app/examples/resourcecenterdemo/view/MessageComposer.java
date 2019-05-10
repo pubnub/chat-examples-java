@@ -9,6 +9,7 @@ import android.widget.RelativeLayout;
 
 import resourcecenterdemo.R;
 
+// tag::SEND-1[]
 public class MessageComposer extends RelativeLayout {
 
     private EditText mInput;
@@ -44,3 +45,4 @@ public class MessageComposer extends RelativeLayout {
     }
 
 }
+// end::SEND-1[]

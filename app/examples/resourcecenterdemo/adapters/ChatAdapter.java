@@ -37,7 +37,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
 
     private final String mChannel;
 
+    // tag::BIND-2[]
     private List<Message> mItems;
+    // end::BIND-2[]
 
     public ChatAdapter(String channel) {
         mChannel = channel;
@@ -49,6 +51,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
         return mItems.get(position).getType();
     }
 
+    // tag::BIND-1[]
     @NonNull
     @Override
     public MessageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -68,6 +71,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
         }
         throw new IllegalStateException("No applicable viewtype found.");
     }
+    // end::BIND-1[]
 
     @Override
     public void onBindViewHolder(@NonNull MessageViewHolder holder, int position) {
@@ -84,12 +88,14 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
         return mItems.get(position).getTimetoken();
     }
 
+    // tag::BIND-4[]
     public void update(List<Message> newData) {
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallback(newData, mItems));
         diffResult.dispatchUpdatesTo(this);
         mItems.clear();
         mItems.addAll(newData);
     }
+    // end::BIND-4[]
 
     class DateViewHolder extends RecyclerView.ViewHolder {
 
