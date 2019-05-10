@@ -28,8 +28,7 @@ public class MainActivity extends ParentActivity implements ParentActivityImpl {
 
     private PubNub mPubNub;
 
-    // final String channel = "Animal Forest";
-    final String channel = "may8mo";
+    final String channel = "demo-animal-forest";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

@@ -35,7 +35,7 @@ public class Users {
                     .lastName(lastNames[i])
                     .profilePictureUrl(images.getResourceId(i, 0))
                     .designation(designations[i])
-                    .uuid("user-" + (i + 1))
+                    .uuid("forest-animal-" + (i + 1))
                     .build());
         }
 

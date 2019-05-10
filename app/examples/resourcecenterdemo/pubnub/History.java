@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class History {
 
-    public static final int TOP_ITEM_OFFSET = 1;
+    public static final int TOP_ITEM_OFFSET = 3;
     private static final int CHUNK_SIZE = 20;
     private static final AtomicBoolean LOADING = new AtomicBoolean(false);
 
