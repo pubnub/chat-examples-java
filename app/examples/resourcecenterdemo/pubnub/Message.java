@@ -11,7 +11,7 @@ import resourcecenterdemo.prefs.Prefs;
 import resourcecenterdemo.util.ChatItem;
 import resourcecenterdemo.util.Helper;
 
-// end::BIND-3[]
+// tag::BIND-3[]
 public class Message extends ChatItem {
 
     private final long TIMESTAMP_DIVIDER = 10_000L;

@@ -52,9 +52,7 @@ public class ChatInfoFragment extends ParentFragment {
 
     private String mChannel;
 
-    // tag::FRG-4.1[]
-    private SubscribeCallback mPubNubListener; // field of Fragment
-    // end::FRG-4.1[]
+    private SubscribeCallback mPubNubListener;
 
     static ChatInfoFragment newInstance(String channel) {
         Bundle args = new Bundle();
@@ -95,8 +93,8 @@ public class ChatInfoFragment extends ParentFragment {
         initListener();
     }
 
+    // tag::LIS-1[]
     private void initListener() {
-        // tag::FRG-4.2[]
         mPubNubListener = new SubscribeCallback() {
             @Override
             public void status(PubNub pubnub, PNStatus status) {
@@ -111,7 +109,6 @@ public class ChatInfoFragment extends ParentFragment {
             @Override
             public void presence(PubNub pubnub, PNPresenceEventResult presence) {
 
-                // tag::ignore[]
                 if (presence.getUuid() == null) {
                     return;
                 }
@@ -142,11 +139,10 @@ public class ChatInfoFragment extends ParentFragment {
                 handleUiVisibility();
 
                 runOnUiThread(() -> mUserAdapter.update(mUsers));
-                // end::ignore[]
             }
         };
-        // end::FRG-4.2[]
     }
+    // end::LIS-1[]
 
     private void handleUiVisibility() {
         int viewState = -1;
@@ -171,6 +167,7 @@ public class ChatInfoFragment extends ParentFragment {
         mChannel = getArguments().getString(ARGS_CHANNEL);
     }
 
+    // tag::ONL-1[]
     private void fetchAvailableUsers() {
         hostActivity.getPubNub()
                 .hereNow()
@@ -190,16 +187,16 @@ public class ChatInfoFragment extends ParentFragment {
                             }
                             mUserAdapter.update(mUsers);
 
+                            int totalOccupancy = hereNowChannelData.getOccupancy();
                         }
                     }
                 });
     }
+    // end::ONL-1[]
 
-    // tag::FRG-4.3[]
     @Override
     public SubscribeCallback provideListener() {
         return mPubNubListener;
     }
-    // end::FRG-4.3[]
 
 }

@@ -53,7 +53,7 @@ public class History {
     }
     // end::HIS-2[]
 
-    // end::HIS-3[]
+    // tag::HIS-3[]
     public static void chainMessages(List<Message> list, int count) {
 
         int limit = count;
