@@ -9,10 +9,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
+import com.pubnub.api.endpoints.pubsub.Publish;
 import com.pubnub.api.enums.PNOperationType;
+import com.pubnub.api.enums.PNStatusCategory;
 import com.pubnub.api.models.consumer.PNPublishResult;
 import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.presence.PNHereNowResult;
@@ -26,6 +29,7 @@ import java.util.List;
 import java.util.UUID;
 
 import androidx.annotation.NonNull;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -35,14 +39,18 @@ import animal.forest.chat.R;
 import animal.forest.chat.adapters.ChatAdapter;
 import animal.forest.chat.pubnub.History;
 import animal.forest.chat.pubnub.Message;
+import animal.forest.chat.services.ConnectivityListener;
 import animal.forest.chat.util.Helper;
 import animal.forest.chat.view.EmptyView;
 import animal.forest.chat.view.MessageComposer;
 import butterknife.BindView;
 
-public class ChatFragment extends ParentFragment implements MessageComposer.Listener {
+public class ChatFragment extends ParentFragment implements MessageComposer.Listener, ConnectivityListener {
 
     private static final String ARGS_CHANNEL = "ARGS_CHANNEL";
+
+    @BindView(R.id.coordinator)
+    CoordinatorLayout mCoordinatorLayout;
 
     @BindView(R.id.chat_swipe)
     SwipeRefreshLayout mSwipeRefreshLayout;
@@ -67,6 +75,8 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
     private SubscribeCallback mPubNubListener;
 
     private RecyclerView.OnScrollListener mOnScrollListener;
+
+    private List<Publish> mUnsentMessages = new ArrayList<>();
 
     public static ChatFragment newInstance(String channel) {
         Bundle args = new Bundle();
@@ -307,19 +317,24 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
             message = messageBuilder.toString();
         }
         // end::ignore[]
-        hostActivity.getPubNub()
+        Publish publishBuilder = hostActivity.getPubNub()
                 .publish()
                 .channel(mChannel)
                 .shouldStore(true)
-                .message(Message.newBuilder().text(message).build())
-                .async(new PNCallback<PNPublishResult>() {
-                    @Override
-                    public void onResponse(PNPublishResult result, PNStatus status) {
-                        if (!status.isError()) {
-                            long newMessageTimetoken = result.getTimetoken();
-                        }
-                    }
-                });
+                .message(Message.newBuilder().text(message).build());
+        publishBuilder.async(new PNCallback<PNPublishResult>() {
+            @Override
+            public void onResponse(PNPublishResult result, PNStatus status) {
+                if (!status.isError()) {
+                    long newMessageTimetoken = result.getTimetoken();
+                } else if (status.getCategory() == PNStatusCategory.PNUnexpectedDisconnectCategory) {
+                    Snackbar.make(mCoordinatorLayout, R.string.no_internet, Snackbar.LENGTH_INDEFINITE).show();
+                    mUnsentMessages.add(publishBuilder);
+                } else {
+                    Snackbar.make(mCoordinatorLayout, R.string.message_not_sent, Snackbar.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
     // end::SEND-2[]
 
@@ -332,5 +347,14 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
     @Override
     public SubscribeCallback provideListener() {
         return mPubNubListener;
+    }
+
+    @Override
+    public void onConnected() {
+        /*Iterator itr = mUnsentMessages.iterator();
+        while (itr.hasNext()) {
+            ((Publish) itr.next()).retry();
+            itr.remove();
+        }*/
     }
 }

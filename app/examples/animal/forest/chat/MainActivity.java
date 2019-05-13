@@ -1,5 +1,7 @@
 package animal.forest.chat;
 
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.MenuItem;
@@ -15,10 +17,14 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import animal.forest.chat.fragments.ChatFragment;
 import animal.forest.chat.prefs.Prefs;
+import animal.forest.chat.services.NetworkReceiver;
 import animal.forest.chat.util.ParentActivityImpl;
 import butterknife.BindView;
 
 public class MainActivity extends ParentActivity implements ParentActivityImpl {
+
+    // The BroadcastReceiver that tracks network connectivity changes.
+    private NetworkReceiver mNetworkReceiver = new NetworkReceiver();
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -32,6 +38,8 @@ public class MainActivity extends ParentActivity implements ParentActivityImpl {
 
     final String channel = "demo-animal-forest";
 
+    private ChatFragment mChatFragment;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,8 +47,17 @@ public class MainActivity extends ParentActivity implements ParentActivityImpl {
         // tag::ignore[]
         setSupportActionBar(mToolbar);
         initializePubNub();
-        addFragment(ChatFragment.newInstance(channel));
+        mChatFragment = ChatFragment.newInstance(channel);
+        addFragment(mChatFragment);
+        initReceiver();
         // end::ignore[]
+    }
+
+    private void initReceiver() {
+        // Registers BroadcastReceiver to track network connection changes.
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        mNetworkReceiver = new NetworkReceiver();
+        this.registerReceiver(mNetworkReceiver, filter);
     }
 
     @Override
@@ -120,12 +137,23 @@ public class MainActivity extends ParentActivity implements ParentActivityImpl {
         }
     }
 
+    public void networkAvailable(boolean available) {
+        // Toast.makeText(this, "Network available: " + available, Toast.LENGTH_LONG).show();
+        if (available)
+            mChatFragment.onConnected();
+    }
+
     // tag::INIT-4[]
     @Override
     protected void onDestroy() {
         mPubNub.unsubscribeAll();
         mPubNub.forceDestroy();
         super.onDestroy();
+        // tag::ignore[]
+        if (mNetworkReceiver != null) {
+            this.unregisterReceiver(mNetworkReceiver);
+        }
+        // end::ignore[]
     }
     // end::INIT-4[]
 }
