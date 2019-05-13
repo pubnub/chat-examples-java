@@ -21,7 +21,7 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <resourcecenterdemo.view.EmptyView
+    <animal.forest.chat.view.EmptyView
         android:id="@+id/chat_empty_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -30,7 +30,7 @@
         app:evMessage="@string/no_messages"
         tools:targetApi="lollipop" />
 
-    <resourcecenterdemo.view.MessageComposer
+    <animal.forest.chat.view.MessageComposer
         android:id="@+id/chats_message_composer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
