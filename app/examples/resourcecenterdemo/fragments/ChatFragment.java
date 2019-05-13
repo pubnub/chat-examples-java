@@ -50,7 +50,7 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
     @BindView(R.id.chat_recycler_view)
     // tag::HIS-4.1[]
             RecyclerView mChatsRecyclerView;
-    // tag::HIS-4.1[]
+    // end::HIS-4.1[]
 
     @BindView(R.id.chats_message_composer)
     MessageComposer mMessageComposer;
