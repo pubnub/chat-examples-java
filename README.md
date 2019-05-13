@@ -9,7 +9,7 @@ Source files for Java based chat example apps and document code samples live her
 | Directory  | Description |
 |:----------:| ----------- |
 | `app/examples` | A feature-rich sample app describing best practices for creating a chat app using the PubNub SDK. |
-| `app/examples/resourcecenterdemo` | Location where the animal chat application is stored. The complete tutorial can be found [here](https://www.pubnub.com/developers/chat-resource-center/docs/getting-started/android/)|
+| `app/examples/animal/forest/chat` | Location where the animal chat application is stored. The complete tutorial can be found [here](https://www.pubnub.com/developers/chat-resource-center/docs/getting-started/android/)|
 | `app/snippets` | A module containing extensive unit tests, in a form of verified and tested code snippets.<br>They can be found inside [Chat Resource Center](https://www.pubnub.com/developers/chat-resource-center/). |
 
 ## Animal Forest Chat Application

@@ -36,7 +36,7 @@
         android:layout_height="match_parent"
         android:layout_below="@id/info_description" />
 
-    <resourcecenterdemo.view.EmptyView
+    <animal.forest.chat.view.EmptyView
         android:id="@+id/info_empty_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

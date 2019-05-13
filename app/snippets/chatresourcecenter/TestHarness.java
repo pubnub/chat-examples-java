@@ -8,7 +8,7 @@ import org.junit.Before;
 
 import java.util.UUID;
 
-import resourcecenterdemo.BuildConfig;
+import animal.forest.chat.BuildConfig;
 
 abstract class TestHarness {
 

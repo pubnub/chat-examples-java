@@ -19,4 +19,6 @@
     <string name="no_members">There are no members!</string>
     <string name="you">You</string>
     <string name="chat_description">A chat group to talk to all your fuzzy friends in the animal kingdom.</string>
+    <string name="no_internet">No internet connection</string>
+    <string name="message_not_sent">Message not sent</string>
 </resources>
