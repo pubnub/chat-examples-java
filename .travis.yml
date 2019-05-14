@@ -34,7 +34,7 @@ android:
 
 jobs:
   include:
-    - stage: deploy
+    - stage: tests
       name: "Code lint"
       before_install:
         - chmod +x gradlew
