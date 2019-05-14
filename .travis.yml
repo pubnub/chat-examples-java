@@ -9,20 +9,34 @@ addons:
 jdk:
   - oraclejdk8
 
+env:
+  global:
+    - ANDROID_API=28
+    - EMULATOR_API=24
+    - ANDROID_BUILD_TOOLS=28.0.3
+
 android:
   components:
     - tools
+    - android-$EMULATOR_API
     - platform-tools
-    - build-tools-28.0.3
-    - android-28
-    - extra-google-m2repository
+    - tools
+    # The BuildTools version used by your project
+    - build-tools-$ANDROID_BUILD_TOOLS
+    # The SDK version used to compile your project
+    - android-$ANDROID_API
+    # Additional components
     - extra-android-m2repository
+    - extra-google-m2repository
+    - sys-img-armeabi-v7a-android-$EMULATOR_API
+  licenses:
+    - ".+"
 
 before_install:
   - chmod +x gradlew
   - echo PUB_KEY="\"${PUB_KEY}\"" >> gradle.properties
   - echo SUB_KEY="\"${SUB_KEY}\"" >> gradle.properties
-  - cat gradle.properties
+  - yes | sdkmanager "platforms;android-${ANDROID_API}"
   - curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
   - sudo apt-get install nodejs
   - sudo apt-get install build-essential
@@ -35,9 +49,17 @@ before_script:
   - git config --global user.name "${GH_NAME}"
   - git config --global user.email "${GH_EMAIL}"
   - echo "machine github.com login ${GH_NAME} password ${GH_TOKEN}"  > ~/.netrc
+  - echo "y" | android update sdk -a --no-ui --filter android-$EMULATOR_API
+  - echo "y" | android update sdk -a --no-ui --filter sys-img-armeabi-v7a-android-$EMULATOR_API
+  - echo no | android create avd --force -n test -t android-$EMULATOR_API --abi armeabi-v7a
+  - emulator -avd test -no-skin -no-window &
+  - android-wait-for-emulator
+  - adb shell input keyevent 82 &
+  - adb wait-for-device get-serialno
 
 script:
   - ./gradlew clean check
+  - ./gradlew connectedAndroidTest
 
 after_success:
   - node .travis.docs.js
