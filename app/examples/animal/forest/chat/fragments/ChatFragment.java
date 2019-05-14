@@ -9,13 +9,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
-import com.pubnub.api.endpoints.pubsub.Publish;
 import com.pubnub.api.enums.PNOperationType;
-import com.pubnub.api.enums.PNStatusCategory;
 import com.pubnub.api.models.consumer.PNPublishResult;
 import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.presence.PNHereNowResult;
@@ -75,8 +72,6 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
     private SubscribeCallback mPubNubListener;
 
     private RecyclerView.OnScrollListener mOnScrollListener;
-
-    private List<Publish> mUnsentMessages = new ArrayList<>();
 
     public static ChatFragment newInstance(String channel) {
         Bundle args = new Bundle();
@@ -317,24 +312,35 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
             message = messageBuilder.toString();
         }
         // end::ignore[]
-        Publish publishBuilder = hostActivity.getPubNub()
+        String finalMessage = message;
+
+        hostActivity.getPubNub()
                 .publish()
                 .channel(mChannel)
                 .shouldStore(true)
-                .message(Message.newBuilder().text(message).build());
-        publishBuilder.async(new PNCallback<PNPublishResult>() {
-            @Override
-            public void onResponse(PNPublishResult result, PNStatus status) {
-                if (!status.isError()) {
-                    long newMessageTimetoken = result.getTimetoken();
-                } else if (status.getCategory() == PNStatusCategory.PNUnexpectedDisconnectCategory) {
-                    Snackbar.make(mCoordinatorLayout, R.string.no_internet, Snackbar.LENGTH_INDEFINITE).show();
-                    mUnsentMessages.add(publishBuilder);
-                } else {
-                    Snackbar.make(mCoordinatorLayout, R.string.message_not_sent, Snackbar.LENGTH_SHORT).show();
-                }
-            }
-        });
+                .message(Message.newBuilder().text(message).build())
+                .async(new PNCallback<PNPublishResult>() {
+                    @Override
+                    public void onResponse(PNPublishResult result, PNStatus status) {
+                        if (!status.isError()) {
+                            long newMessageTimetoken = result.getTimetoken();
+                        } else {
+                            Message msg = Message.createUnsentMessage(Message.newBuilder().text(finalMessage).build());
+                            mMessages.add(msg);
+                            History.chainMessages(mMessages, mMessages.size());
+                            runOnUiThread(() -> {
+                                if (mEmptyView.getVisibility() == View.VISIBLE) {
+                                    mEmptyView.setVisibility(View.GONE);
+                                }
+                                mChatAdapter.update(mMessages);
+                                scrollChatToBottom();
+
+                                Toast.makeText(fragmentContext, R.string.message_not_sent, Toast.LENGTH_SHORT).show();
+
+                            });
+                        }
+                    }
+                });
     }
     // end::SEND-2[]
 
@@ -351,10 +357,6 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
 
     @Override
     public void onConnected() {
-        /*Iterator itr = mUnsentMessages.iterator();
-        while (itr.hasNext()) {
-            ((Publish) itr.next()).retry();
-            itr.remove();
-        }*/
+
     }
 }

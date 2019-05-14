@@ -138,7 +138,6 @@ public class MainActivity extends ParentActivity implements ParentActivityImpl {
     }
 
     public void networkAvailable(boolean available) {
-        // Toast.makeText(this, "Network available: " + available, Toast.LENGTH_LONG).show();
         if (available)
             mChatFragment.onConnected();
     }

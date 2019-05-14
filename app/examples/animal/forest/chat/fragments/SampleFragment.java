@@ -12,6 +12,7 @@ public class SampleFragment extends ParentFragment implements PNFragmentImpl {
 
     // tag::FRG-4.1[]
     private SubscribeCallback mPubNubListener; // field of Fragment
+
     // end::FRG-4.1[]
 
     @Override
@@ -53,12 +54,10 @@ public class SampleFragment extends ParentFragment implements PNFragmentImpl {
             }
         };
     }
-    // end::FRG-4.2[]
 
-    // tag::FRG-4.3[]
     @Override
     public SubscribeCallback provideListener() {
         return mPubNubListener;
     }
-    // end::FRG-4.3[]
+    // end::FRG-4.2[]
 }

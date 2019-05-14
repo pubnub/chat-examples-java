@@ -14,7 +14,7 @@ import animal.forest.chat.util.Helper;
 // tag::BIND-3[]
 public class Message extends ChatItem {
 
-    private final long TIMESTAMP_DIVIDER = 10_000L;
+    private static final long TIMESTAMP_DIVIDER = 10_000L;
 
     private String senderId, text;
 
@@ -50,6 +50,8 @@ public class Message extends ChatItem {
 */
     // end::ignore[]
     // end::BIND-3[]
+
+    private transient boolean sent = true;
 
     /**
      * Disable instance creation via constructor.
@@ -129,6 +131,14 @@ public class Message extends ChatItem {
     }
     // end::MSG-2[]
 
+    public static Message createUnsentMessage(JsonObject jsonObject) {
+        Message message = new Gson().fromJson(jsonObject, Message.class);
+        message.timetoken = System.currentTimeMillis() * TIMESTAMP_DIVIDER;
+        message.initializeCustomProperties();
+        message.setSent(false);
+        return message;
+    }
+
     private JsonObject generate() {
         String json = new Gson().toJson(this);
         JsonObject payload = new JsonParser().parse(json).getAsJsonObject();
@@ -167,4 +177,11 @@ public class Message extends ChatItem {
         return key;
     }
 
+    public boolean isSent() {
+        return sent;
+    }
+
+    public void setSent(boolean sent) {
+        this.sent = sent;
+    }
 }
