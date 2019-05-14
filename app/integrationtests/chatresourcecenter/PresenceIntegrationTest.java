@@ -7,6 +7,7 @@ import com.pubnub.api.models.consumer.presence.PNHereNowChannelData;
 import com.pubnub.api.models.consumer.presence.PNHereNowOccupantData;
 import com.pubnub.api.models.consumer.presence.PNHereNowResult;
 
+import org.awaitility.Awaitility;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,24 +15,24 @@ import org.junit.runner.RunWith;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-import chatresourcecenter.util.TestHarness;
 
 @RunWith(AndroidJUnit4.class)
 public class PresenceIntegrationTest extends TestHarness {
 
     @Test
-    public void testHereNow() throws InterruptedException {
-        final CountDownLatch signal = new CountDownLatch(1);
-        final String channel = UUID.randomUUID().toString();
+    public void testHereNow() {
+        final AtomicBoolean success = new AtomicBoolean(false);
+
+        final String channel = randomUuid();
 
         List<String> userList = new ArrayList<>();
-        userList.add("user_uuid_1");
-        userList.add("user_uuid_2");
-        userList.add("user_uuid_3");
+        userList.add(randomUuid());
+        userList.add(randomUuid());
+        userList.add(randomUuid());
 
         PubNub user1 = getPubNub(userList.get(0));
         PubNub user2 = getPubNub(userList.get(1));
@@ -41,7 +42,7 @@ public class PresenceIntegrationTest extends TestHarness {
         subscribeToChannel(user2, channel);
         subscribeToChannel(user3, channel);
 
-        wait(1);
+        wait(TIMEOUT_SHORT);
 
         pubNub.hereNow()
                 .channels(Arrays.asList(channel))
@@ -49,8 +50,12 @@ public class PresenceIntegrationTest extends TestHarness {
                 .async(new PNCallback<PNHereNowResult>() {
                     @Override
                     public void onResponse(PNHereNowResult result, PNStatus status) {
-                        int numberOfSubscribers = 0;
                         Assert.assertFalse(status.isError());
+
+                        int numberOfSubscribers = 0;
+
+                        Assert.assertEquals(1, result.getTotalChannels());
+                        Assert.assertEquals(userList.size(), result.getTotalOccupancy());
 
                         for (PNHereNowChannelData channelData : result.getChannels().values()) {
                             for (PNHereNowOccupantData pnHereNowOccupantData : channelData.getOccupants()) {
@@ -61,19 +66,17 @@ public class PresenceIntegrationTest extends TestHarness {
                                 }
                             }
                         }
-                        Assert.assertEquals(3, numberOfSubscribers);
+                        Assert.assertEquals(userList.size(), numberOfSubscribers);
 
-                        user1.disconnect();
-                        user1.destroy();
-                        user2.disconnect();
-                        user2.destroy();
-                        user3.disconnect();
-                        user3.destroy();
+                        destroyClient(user1);
+                        destroyClient(user2);
+                        destroyClient(user3);
 
-                        signal.countDown();
+                        success.set(true);
                     }
                 });
 
-        signal.await();
+        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(success);
+
     }
 }

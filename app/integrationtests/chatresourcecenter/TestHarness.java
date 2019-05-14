@@ -1,7 +1,8 @@
-package chatresourcecenter.util;
+package chatresourcecenter;
 
 import android.os.SystemClock;
 
+import com.google.gson.JsonObject;
 import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.PNCallback;
@@ -12,17 +13,15 @@ import com.pubnub.api.models.consumer.PNStatus;
 import org.junit.After;
 import org.junit.Before;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collections;
 import java.util.UUID;
 
 import animal.forest.chat.BuildConfig;
 
-abstract public class TestHarness {
+abstract class TestHarness {
 
-    public PubNub pubNub;
-    public PubNub observerClient;
+    PubNub pubNub;
+    PubNub observerClient;
 
     static final String SUB_KEY = BuildConfig.SUB_KEY;
     static final String PUB_KEY = BuildConfig.PUB_KEY;
@@ -43,7 +42,7 @@ abstract public class TestHarness {
         destroyClient(observerClient);
     }
 
-    private void destroyClient(PubNub client) {
+    void destroyClient(PubNub client) {
         client.unsubscribeAll();
         client.forceDestroy();
         client = null;
@@ -78,27 +77,27 @@ abstract public class TestHarness {
         return UUID.randomUUID().toString();
     }
 
-    protected void wait(int seconds) {
+    void wait(int seconds) {
         SystemClock.sleep(seconds * 1000);
     }
 
-    protected void subscribeToChannel(String channel) {
+    void subscribeToChannel(String channel) {
         pubNub.subscribe()
-                .channels(Arrays.asList(channel))
+                .channels(Collections.singletonList(channel))
                 .withPresence()
                 .execute();
     }
 
-    protected void subscribeToChannel(PubNub pubnub, String channel) {
+    void subscribeToChannel(PubNub pubnub, String channel) {
         pubnub.subscribe()
-                .channels(Arrays.asList(channel))
+                .channels(Collections.singletonList(channel))
                 .withPresence()
                 .execute();
     }
 
-    protected void publishMessage(String channel, String message) {
+    void publishMessage(String channel, JsonObject message) {
         pubNub.publish()
-                .message(generateMessage(pubNub, message))
+                .message(message)
                 .channel(channel)
                 .shouldStore(true)
                 .async(new PNCallback<PNPublishResult>() {
@@ -109,17 +108,24 @@ abstract public class TestHarness {
                 });
     }
 
-    protected void publishMessages(String channel, int counter) {
+    void publishMessages(String channel, int counter) {
         for (int i = 0; i < counter; i++) {
-            publishMessage(channel, UUID.randomUUID().toString());
+            publishMessage(channel, randomMessage());
         }
     }
 
-    protected Map generateMessage(PubNub pubNub, String message) {
-        Map<String, String> map = new HashMap<>();
-        map.put("publisher", pubNub.getConfiguration().getUuid());
-        map.put("text", message);
-
-        return map;
+    JsonObject randomMessage() {
+        JsonObject messagePayload = new JsonObject();
+        messagePayload.addProperty("senderId", pubNub.getConfiguration().getUuid());
+        messagePayload.addProperty("text", randomUuid());
+        return messagePayload;
     }
+
+    JsonObject randomMessage(PubNub client) {
+        JsonObject messagePayload = new JsonObject();
+        messagePayload.addProperty("senderId", client.getConfiguration().getUuid());
+        messagePayload.addProperty("text", randomUuid());
+        return messagePayload;
+    }
+
 }

@@ -74,7 +74,7 @@ checkstyle {
 }
 
 task checkstyle(type: Checkstyle) {
-    source "$snippetsPath"
+    source "$snippetsPath", "$integrationTestsPath"
     include '**/*.java'
     include '**/*.java'
     exclude '**/gen/**'
@@ -105,7 +105,7 @@ dependencies {
     implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
 
     testImplementation 'junit:junit:4.12'
-    implementation 'org.awaitility:awaitility:3.1.5'
+    testImplementation 'org.awaitility:awaitility:3.1.5'
 
     // Core library
     androidTestImplementation 'androidx.test:core:1.1.0'
@@ -113,4 +113,5 @@ dependencies {
     // AndroidJUnitRunner and JUnit Rules
     androidTestImplementation 'androidx.test:runner:1.1.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.0'
+    androidTestImplementation 'org.awaitility:awaitility:3.1.5'
 }

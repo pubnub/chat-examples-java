@@ -20,7 +20,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-import chatresourcecenter.util.TestHarness;
 
 import static org.junit.Assert.assertEquals;
 
@@ -29,8 +28,9 @@ public class PresenceEventsIntegrationTests extends TestHarness {
 
     @Test
     public void testJoinChannel() {
+        final AtomicBoolean success = new AtomicBoolean(false);
+
         final String channel = UUID.randomUUID().toString();
-        final AtomicBoolean atomic = new AtomicBoolean(false);
 
         pubNub.addListener(new SubscribeCallback() {
             @Override
@@ -47,30 +47,24 @@ public class PresenceEventsIntegrationTests extends TestHarness {
             public void presence(PubNub pubnub, PNPresenceEventResult presence) {
                 if (presence.getEvent().equals("join")) {
                     Assert.assertEquals(channel, presence.getChannel());
-                    pubnub.removeListener(this);
-                    atomic.set(true);
+                    Assert.assertEquals(pubnub.getConfiguration().getUuid(), presence.getUuid());
+                    success.set(true);
                 }
             }
         });
 
         subscribeToChannel(channel);
 
-        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(atomic);
+        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(success);
     }
 
     @Test
     public void testLeaveChannel() {
-        final AtomicBoolean atomic = new AtomicBoolean(false);
-        final String channel = UUID.randomUUID().toString();
+        final AtomicBoolean success = new AtomicBoolean(false);
 
-        PubNub guestUser = getPubNub("guest-" + UUID.randomUUID().toString());
+        final String channel = randomUuid();
 
-        subscribeToChannel(channel);
-        subscribeToChannel(guestUser, channel);
-
-        wait(1);
-
-        pubNub.addListener(new SubscribeCallback() {
+        observerClient.addListener(new SubscribeCallback() {
             @Override
             public void status(PubNub pubnub, PNStatus status) {
 
@@ -85,24 +79,31 @@ public class PresenceEventsIntegrationTests extends TestHarness {
             public void presence(PubNub pubnub, PNPresenceEventResult presence) {
                 if (presence.getEvent().equals("leave")) {
                     assertEquals(channel, presence.getChannel());
-                    atomic.set(true);
+                    assertEquals(pubNub.getConfiguration().getUuid(), presence.getUuid());
+                    success.set(true);
                 }
             }
         });
 
-        guestUser.unsubscribe()
+        subscribeToChannel(observerClient, channel);
+        subscribeToChannel(channel);
+
+        wait(TIMEOUT_SHORT);
+
+        pubNub.unsubscribe()
                 .channels(Arrays.asList(channel))
                 .execute();
 
-        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(atomic);
+        Awaitility.await().atMost(TIMEOUT_MEDIUM, TimeUnit.SECONDS).untilTrue(success);
     }
 
     @Test
     public void testTimeoutFromChannel() {
-        final AtomicBoolean atomic = new AtomicBoolean(false);
-        pubNub.getConfiguration().setPresenceTimeout(2);
+        final AtomicBoolean success = new AtomicBoolean(false);
 
-        final String channel = UUID.randomUUID().toString();
+        final String channel = randomUuid();
+
+        pubNub.getConfiguration().setPresenceTimeout(2);
 
         pubNub.addListener(new SubscribeCallback() {
             @Override
@@ -119,15 +120,15 @@ public class PresenceEventsIntegrationTests extends TestHarness {
             public void presence(PubNub pubnub, PNPresenceEventResult presence) {
                 if (presence.getEvent().equals("timeout")) {
                     Assert.assertEquals(channel, presence.getChannel());
-                    pubnub.removeListener(this);
-                    atomic.set(true);
+                    Assert.assertEquals(pubNub.getConfiguration().getUuid(), presence.getUuid());
+                    success.set(true);
                 }
             }
         });
 
         subscribeToChannel(channel);
 
-        Awaitility.await().atMost(TIMEOUT_LONG, TimeUnit.SECONDS).untilTrue(atomic);
+        Awaitility.await().atMost(TIMEOUT_LONG, TimeUnit.SECONDS).untilTrue(success);
     }
 
     @Test
@@ -155,7 +156,8 @@ public class PresenceEventsIntegrationTests extends TestHarness {
 
             @Override
             public void presence(PubNub pubnub, PNPresenceEventResult presence) {
-                if (presence.getEvent().equals("state-change") && presence.getUuid().equals(pubnub.getConfiguration().getUuid())) {
+                if (presence.getEvent().equals("state-change") && presence.getUuid()
+                        .equals(pubnub.getConfiguration().getUuid())) {
                     Assert.assertEquals("state-change", presence.getEvent());
                     pubnub.removeListener(this);
                     atomic.set(true);
