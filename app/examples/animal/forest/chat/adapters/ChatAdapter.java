@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -116,6 +117,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
 
         private int mType;
 
+        @BindView(R.id.root)
+        RelativeLayout mRoot;
+
         @BindView(R.id.message_avatar)
         ImageView mAvatar;
 
@@ -159,6 +163,12 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
                     .load(mMessage.getUser().getProfilePictureUrl())
                     .apply(RequestOptions.circleCropTransform())
                     .into(mAvatar);
+
+            if (this.mMessage.isSent()) {
+                mBubble.setAlpha(1.0f);
+            } else {
+                mBubble.setAlpha(0.5f);
+            }
 
         }
 
@@ -213,7 +223,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
 
         @Override
         public boolean areContentsTheSame(int i, int i1) {
-            return oldMessages.get(i).getType() == newMessages.get(i1).getType();
+            boolean type = oldMessages.get(i).getType() == newMessages.get(i1).getType();
+            boolean sent = oldMessages.get(i).isSent() == newMessages.get(i1).isSent();
+            return type && sent;
         }
 
     }
@@ -235,6 +247,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
         contentBuilder.append(AndroidUtils.newLine());
         contentBuilder.append(AndroidUtils.emphasizeText("Type: "));
         contentBuilder.append(message.getType());
+        contentBuilder.append(AndroidUtils.newLine());
+        contentBuilder.append(AndroidUtils.emphasizeText("Is sent: "));
+        contentBuilder.append(message.isSent());
 
         MaterialDialog materialDialog = new MaterialDialog.Builder(context)
                 .title(R.string.message_info)
