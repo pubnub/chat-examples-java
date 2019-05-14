@@ -5,6 +5,7 @@ check.dependsOn('checkstyle')
 
 def snippetsPath = "snippets"
 def examplesPath = "examples"
+def integrationTestsPath = "integrationtests"
 
 // tag::KEYS-1[]
 android {
@@ -17,6 +18,7 @@ android {
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         // tag::ignore[]
         vectorDrawables.useSupportLibrary = true
         // end::ignore[]
@@ -46,6 +48,9 @@ android {
         test {
             java.srcDirs = ["$snippetsPath"]
         }
+        androidTest {
+            java.srcDirs = ["$integrationTestsPath"]
+        }
     }
 
     android.applicationVariants.all { variant ->
@@ -69,7 +74,7 @@ checkstyle {
 }
 
 task checkstyle(type: Checkstyle) {
-    source "$snippetsPath"
+    source "$snippetsPath", "$integrationTestsPath"
     include '**/*.java'
     include '**/*.java'
     exclude '**/gen/**'
@@ -99,4 +104,12 @@ dependencies {
 
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.awaitility:awaitility:3.1.5'
+
+    // Core library
+    androidTestImplementation 'androidx.test:core:1.1.0'
+
+    // AndroidJUnitRunner and JUnit Rules
+    androidTestImplementation 'androidx.test:runner:1.1.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.0'
+    androidTestImplementation 'org.awaitility:awaitility:3.1.5'
 }
