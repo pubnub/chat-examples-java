@@ -9,7 +9,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
@@ -335,10 +334,8 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
                                 }
                                 mChatAdapter.update(mMessages);
                                 scrollChatToBottom();
-                                Snackbar snackbar = Snackbar.make(mCoordinatorLayout, R.string.message_not_sent,
-                                        Snackbar.LENGTH_SHORT);
 
-                                snackbar.show();
+                                Toast.makeText(fragmentContext, R.string.message_not_sent, Toast.LENGTH_SHORT).show();
 
                             });
                         }
