@@ -1,11 +1,6 @@
 language: android
 sudo: required
 
-addons:
-  apt:
-    packages:
-      - lynx
-
 jdk:
   - oraclejdk8
 
