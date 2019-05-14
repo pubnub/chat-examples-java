@@ -36,8 +36,8 @@ Add your publish and subscribe keys by executing the following commands:
 
 ```bash
 cd app/
-echo PUB_KEY="\"demo\"" >> gradle.properties
-echo SUB_KEY="\"demo\"" >> gradle.properties
+echo PUB_KEY="\"YOUR-PUBNUB-PUB-KEY-HERE\"" >> gradle.properties
+echo SUB_KEY="\"YOUR-PUBNUB-SUB-KEY-HERE\"" >> gradle.properties
 ```
 
 This will also create a `app/gradle.properties` file which is a good place to store confidential information.
