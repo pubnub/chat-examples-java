@@ -9,7 +9,7 @@ Source files for Java based chat example apps and document code samples live her
 | Directory  | Description |
 |:----------:| ----------- |
 | `app/examples` | A feature-rich sample app describing best practices for creating a chat app using the PubNub SDK. |
-| `app/examples/animal/forest/chat` | Location where the animal chat application is stored. The complete tutorial can be found [here](https://www.pubnub.com/developers/chat-resource-center/docs/getting-started/android/)|
+| `app/examples/animal/forest/chat` | Location where the animal chat application is stored. The complete tutorial can be found [here](https://www.pubnub.com/developers/chat-resource-center/docs/getting-started/android/).|
 | `app/snippets` | A module containing extensive unit tests, in a form of verified and tested code snippets.<br>They can be found inside [Chat Resource Center](https://www.pubnub.com/developers/chat-resource-center/). |
 
 ## Animal Forest Chat Application
@@ -20,7 +20,7 @@ Source files for Java based chat example apps and document code samples live her
 * Android Studio 3.0+
 * JDK 8
 
-## Building the project
+## Prerequisites
 
 ### Sign Up for a PubNub Account
 
@@ -36,24 +36,23 @@ Add your publish and subscribe keys by executing the following commands:
 
 ```bash
 cd app/
-echo PUB_KEY="\"YOUR-PUBNUB-PUB-KEY-HERE\"" >> gradle.properties
-echo SUB_KEY="\"YOUR-PUBNUB-SUB-KEY-HERE\"" >> gradle.properties
+echo PUB_KEY="\"YOUR_PUBNUB_PUB_KEY\"" >> gradle.properties
+echo SUB_KEY="\"YOUR_PUBNUB_SUB_KEY\"" >> gradle.properties
+echo app/gradle.properties >> ../.gitignore
 ```
 
 This will also create a `app/gradle.properties` file which is a good place to store confidential information.
 
 ## Building the project
 
-- Open the project by choosing `Open an existing Android Studio project` from the Android Studio Welcome screen: 
+1. Clone the repo
 
-![Android Studio Welcome Screen](https://i.ibb.co/r6VpBp0/3.png "Android Studio Welcome Screen")
+1. Open the project by choosing `Open an existing Android Studio project` from the Android Studio Welcome screen
 
-- Select the root project folder `chat-examples-java/`.
+1. Select the root project folder `chat-examples-java/`
 
-- Wait for gradle to download dependecies and sync the project.
+1. Choose the `app` module and click `Run`
 
-### Build and run the sample app
+## Further Information
 
-- Choose `app` and press the green play button
-
-![Sample app](https://i.ibb.co/58H17nv/4.png "Sample app")
+For more information about this project, or how to create your own chat app using PubNub, please check out our [tutorial](https://www.pubnub.com/developers/chat-resource-center/docs/getting-started/android/).
