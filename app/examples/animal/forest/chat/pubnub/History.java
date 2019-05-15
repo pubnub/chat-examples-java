@@ -107,7 +107,7 @@ public class History {
                 if (entry.getValue().get(i).isOwnMessage()) {
                     switch (entry.getValue().get(i).getSuccessivenessType()) {
                         case Message.TYPE_HEADER:
-                            type = TYPE_OWN_HEADER;
+                            type = TYPE_OWN_HEADER_SERIES;
                             break;
                         case Message.TYPE_MIDDLE:
                             type = TYPE_OWN_MIDDLE;
@@ -119,7 +119,7 @@ public class History {
                 } else {
                     switch (entry.getValue().get(i).getSuccessivenessType()) {
                         case Message.TYPE_HEADER:
-                            type = TYPE_REC_HEADER;
+                            type = TYPE_REC_HEADER_SERIES;
                             break;
                         case Message.TYPE_MIDDLE:
                             type = TYPE_REC_MIDDLE;

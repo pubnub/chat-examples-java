@@ -3,17 +3,20 @@ package animal.forest.chat.pubnub;
 import java.util.concurrent.TimeUnit;
 
 import static animal.forest.chat.util.ChatItem.TYPE_OWN_END;
-import static animal.forest.chat.util.ChatItem.TYPE_OWN_HEADER;
+import static animal.forest.chat.util.ChatItem.TYPE_OWN_HEADER_SERIES;
+import static animal.forest.chat.util.ChatItem.TYPE_OWN_HEADER_FULL;
 import static animal.forest.chat.util.ChatItem.TYPE_OWN_MIDDLE;
 import static animal.forest.chat.util.ChatItem.TYPE_REC_END;
-import static animal.forest.chat.util.ChatItem.TYPE_REC_HEADER;
+import static animal.forest.chat.util.ChatItem.TYPE_REC_HEADER_SERIES;
+import static animal.forest.chat.util.ChatItem.TYPE_REC_HEADER_FULL;
 import static animal.forest.chat.util.ChatItem.TYPE_REC_MIDDLE;
 
-public class MessageHelper {
+class MessageHelper {
 
-    private static final int HEADER = 10;
-    private static final int MIDDLE = 20;
-    private static final int END = 30;
+    private static final int HEADER_FULL = 10;
+    private static final int HEADER = 20;
+    private static final int MIDDLE = 30;
+    private static final int END = 40;
 
     private MessageHelper() {
     }
@@ -33,24 +36,30 @@ public class MessageHelper {
         if (ownMessage) {
             if (chainable) {
                 currentMsg.setType(assignType(currentMsg, END));
-                if (!isTypeOf(previousMsg, HEADER)) {
+
+                if (isTypeOf(previousMsg, HEADER_FULL)) {
+                    previousMsg.setType(assignType(previousMsg, HEADER));
+                } else if (isTypeOf(previousMsg, END)) {
                     previousMsg.setType(assignType(previousMsg, MIDDLE));
                 }
             } else {
-                currentMsg.setType(assignType(currentMsg, HEADER));
-                if (!isTypeOf(previousMsg, HEADER)) {
+                currentMsg.setType(assignType(currentMsg, HEADER_FULL));
+                if (!isTypeOf(previousMsg, HEADER_FULL)) {
                     previousMsg.setType(assignType(previousMsg, END));
                 }
             }
         } else {
-            currentMsg.setType(assignType(currentMsg, HEADER));
+            currentMsg.setType(assignType(currentMsg, HEADER_FULL));
         }
 
     }
 
     private static boolean isTypeOf(Message instance, int type) {
+        if (type == HEADER_FULL) {
+            return instance.getType() == TYPE_OWN_HEADER_FULL || instance.getType() == TYPE_REC_HEADER_FULL;
+        }
         if (type == HEADER) {
-            return instance.getType() == TYPE_OWN_HEADER || instance.getType() == TYPE_REC_HEADER;
+            return instance.getType() == TYPE_OWN_HEADER_SERIES || instance.getType() == TYPE_REC_HEADER_SERIES;
         }
         if (type == MIDDLE) {
             return instance.getType() == TYPE_OWN_MIDDLE || instance.getType() == TYPE_REC_MIDDLE;
@@ -62,8 +71,11 @@ public class MessageHelper {
     }
 
     private static int assignType(Message instance, int type) {
+        if (type == HEADER_FULL) {
+            return instance.isOwnMessage() ? TYPE_OWN_HEADER_FULL : TYPE_REC_HEADER_FULL;
+        }
         if (type == HEADER) {
-            return instance.isOwnMessage() ? TYPE_OWN_HEADER : TYPE_REC_HEADER;
+            return instance.isOwnMessage() ? TYPE_OWN_HEADER_SERIES : TYPE_REC_HEADER_SERIES;
         }
         if (type == MIDDLE) {
             return instance.isOwnMessage() ? TYPE_OWN_MIDDLE : TYPE_REC_MIDDLE;

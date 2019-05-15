@@ -103,7 +103,7 @@ public class Message extends ChatItem {
         timestamp = Helper.parseTime(timetoken / TIMESTAMP_DIVIDER);
         user = Users.getUserById(senderId);
         key = Helper.trimTime(timetoken / TIMESTAMP_DIVIDER);
-        type = ownMessage ? TYPE_OWN_HEADER : TYPE_REC_HEADER;
+        type = ownMessage ? TYPE_OWN_HEADER_FULL : TYPE_REC_HEADER_FULL;
     }
 
     @Override
