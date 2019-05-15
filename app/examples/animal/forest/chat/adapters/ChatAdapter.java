@@ -18,6 +18,7 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
+import animal.forest.chat.BuildConfig;
 import animal.forest.chat.R;
 import animal.forest.chat.pubnub.Message;
 import animal.forest.chat.util.AndroidUtils;
@@ -134,7 +135,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
 
         @OnClick(R.id.root)
         void rootClick(View v) {
-            showMessageInfoDialog(v.getContext(), mMessage);
+            if (BuildConfig.DEBUG) {
+                showMessageInfoDialog(v.getContext(), mMessage);
+            }
         }
 
         Message mMessage;

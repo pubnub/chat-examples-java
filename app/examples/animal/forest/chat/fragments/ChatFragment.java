@@ -32,6 +32,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import animal.forest.chat.BuildConfig;
 import animal.forest.chat.R;
 import animal.forest.chat.adapters.ChatAdapter;
 import animal.forest.chat.pubnub.History;
@@ -305,11 +306,15 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
     public void onSentClick(String message) {
         // tag::ignore[]
         if (TextUtils.isEmpty(message)) {
-            StringBuilder messageBuilder = new StringBuilder("");
-            messageBuilder.append(UUID.randomUUID().toString().substring(0, 8).toUpperCase());
-            messageBuilder.append("\n");
-            messageBuilder.append(Helper.parseDateTime(System.currentTimeMillis()));
-            message = messageBuilder.toString();
+            if (BuildConfig.DEBUG) {
+                StringBuilder messageBuilder = new StringBuilder("");
+                messageBuilder.append(UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+                messageBuilder.append("\n");
+                messageBuilder.append(Helper.parseDateTime(System.currentTimeMillis()));
+                message = messageBuilder.toString();
+            } else {
+                return;
+            }
         }
         // end::ignore[]
         String finalMessage = message;
