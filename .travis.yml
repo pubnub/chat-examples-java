@@ -35,6 +35,7 @@ jobs:
         - chmod +x gradlew
         - echo PUB_KEY="\"${PUB_KEY}\"" >> gradle.properties
         - echo SUB_KEY="\"${SUB_KEY}\"" >> gradle.properties
+        - echo "Code lint before install"
       script: ./gradlew clean check
     - name: "Integration tests"
       before_install:
@@ -42,10 +43,12 @@ jobs:
         - echo PUB_KEY="\"${PUB_KEY}\"" >> gradle.properties
         - echo SUB_KEY="\"${SUB_KEY}\"" >> gradle.properties
         - yes | sdkmanager "platforms;android-${ANDROID_API}"
+        - echo "Integration tests before install"
       before_script:
         - echo "y" | android update sdk -a --no-ui --filter android-$EMULATOR_API
         - echo "y" | android update sdk -a --no-ui --filter sys-img-armeabi-v7a-android-$EMULATOR_API
         - echo no | android create avd --force -n test -t android-$EMULATOR_API --abi armeabi-v7a
+        - echo "Integration tests before script"
         - emulator -avd test -no-skin -no-window &
         - android-wait-for-emulator
         - adb shell input keyevent 82 &
@@ -58,13 +61,13 @@ jobs:
         - curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
         - sudo apt-get install nodejs
         - sudo apt-get install build-essential
-        - echo PUB_KEY="\"${PUB_KEY}\"" >> gradle.properties
-        - echo SUB_KEY="\"${SUB_KEY}\"" >> gradle.properties
-      install:
+        - echo "Update reference before install"
+      install: 
         - npm config set strict-ssl false
         - npm install chalk fancy-log simple-git
       before_script:
         - git config --global user.name "${GH_NAME}"
         - git config --global user.email "${GH_EMAIL}"
         - echo "machine github.com login ${GH_NAME} password ${GH_TOKEN}"  > ~/.netrc
-      after_success: node .travis.docs.js
+        - echo "Update reference before script"
+      script: node .travis.docs.js
