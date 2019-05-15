@@ -1,11 +1,6 @@
 language: android
 sudo: required
 
-addons:
-  apt:
-    packages:
-      - lynx
-
 jdk:
   - oraclejdk8
 
@@ -32,38 +27,42 @@ android:
   licenses:
     - ".+"
 
-before_install:
-  - chmod +x gradlew
-  - echo PUB_KEY="\"${PUB_KEY}\"" >> gradle.properties
-  - echo SUB_KEY="\"${SUB_KEY}\"" >> gradle.properties
-  - yes | sdkmanager "platforms;android-${ANDROID_API}"
-  - curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
-  - sudo apt-get install nodejs
-  - sudo apt-get install build-essential
+jobs:
+  include:
+    - stage: tests
+      name: "Code lint"
+      before_install:
+        - chmod +x gradlew
+        - echo PUB_KEY="\"${PUB_KEY}\"" >> gradle.properties
+        - echo SUB_KEY="\"${SUB_KEY}\"" >> gradle.properties
+      script: ./gradlew clean check
+    - name: "Integration tests"
+      before_install:
+        - chmod +x gradlew
+        - echo PUB_KEY="\"${PUB_KEY}\"" >> gradle.properties
+        - echo SUB_KEY="\"${SUB_KEY}\"" >> gradle.properties
+        - yes | sdkmanager "platforms;android-${ANDROID_API}"
+      before_script:
+        - echo "y" | android update sdk -a --no-ui --filter android-$EMULATOR_API
+        - echo "y" | android update sdk -a --no-ui --filter sys-img-armeabi-v7a-android-$EMULATOR_API
+        - echo no | android create avd --force -n test -t android-$EMULATOR_API --abi armeabi-v7a
+        - emulator -avd test -no-skin -no-window &
+        - android-wait-for-emulator
+        - adb shell input keyevent 82 &
+        - adb wait-for-device get-serialno
+      script: ./gradlew connectedAndroidTest
 
-install:
-  - npm config set strict-ssl false
-  - npm install chalk fancy-log simple-git
-
-before_script:
-  - git config --global user.name "${GH_NAME}"
-  - git config --global user.email "${GH_EMAIL}"
-  - echo "machine github.com login ${GH_NAME} password ${GH_TOKEN}"  > ~/.netrc
-  - echo "y" | android update sdk -a --no-ui --filter android-$EMULATOR_API
-  - echo "y" | android update sdk -a --no-ui --filter sys-img-armeabi-v7a-android-$EMULATOR_API
-  - echo no | android create avd --force -n test -t android-$EMULATOR_API --abi armeabi-v7a
-  - emulator -avd test -no-skin -no-window &
-  - android-wait-for-emulator
-  - adb shell input keyevent 82 &
-  - adb wait-for-device get-serialno
-
-script:
-  - ./gradlew clean check
-  - ./gradlew connectedAndroidTest
-
-after_success:
-  - node .travis.docs.js
-  
-after_failure:
-  - if [ -f /home/travis/build/pubnub/chat-examples-java/Examples/build/reports/lint-results.html]; then lynx -dump /home/travis/build/pubnub/chat-examples-java/Examples/build/reports/lint-results.html; fi
-
+    - stage: submodule
+      name: "Update reference"
+      before_install:
+        - curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
+        - sudo apt-get install nodejs
+        - sudo apt-get install build-essential
+      install:
+        - npm config set strict-ssl false
+        - npm install chalk fancy-log simple-git
+      before_script:
+        - git config --global user.name "${GH_NAME}"
+        - git config --global user.email "${GH_EMAIL}"
+        - echo "machine github.com login ${GH_NAME} password ${GH_TOKEN}"  > ~/.netrc
+      after_success: node .travis.docs.js
