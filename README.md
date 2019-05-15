@@ -1,6 +1,6 @@
 # PubNub Java Chat
 
-Source files for Java based chat example apps and document code samples live here.
+This repository contains sample code from the [Chat Resource Center](https://www.pubnub.com/developers/chat-resource-center/).
 
 [![Build Status](https://travis-ci.com/pubnub/chat-examples-java.svg?token=33vivoVBsBm3RMEntDqx&branch=master)](https://travis-ci.com/pubnub/chat-examples-java)
 
@@ -8,19 +8,17 @@ Source files for Java based chat example apps and document code samples live her
 
 | Directory  | Description |
 |:----------:| ----------- |
-| `app/examples` | A feature-rich sample app describing best practices for creating a chat app using the PubNub SDK. |
-| `app/examples/animal/forest/chat` | Location where the animal chat application is stored. The complete tutorial can be found [here](https://www.pubnub.com/developers/chat-resource-center/docs/getting-started/android/)|
-| `app/snippets` | A module containing extensive unit tests, in a form of verified and tested code snippets.<br>They can be found inside [Chat Resource Center](https://www.pubnub.com/developers/chat-resource-center/). |
+| `app/examples` | Sample applications which show how to implement chat functionality using the PubNub SDK. |
+| `app/examples/animal/forest/chat` | Source files for the Animal Forest Chat application. The complete tutorial can be found [here](https://www.pubnub.com/developers/chat-resource-center/docs/getting-started/android/). |
+| `app/snippets` | Verified and tested code snippets used in documentation.<br>Snippets from `chatresourcecenter` are used in the [Chat Resource Center](https://www.pubnub.com/developers/chat-resource-center/). |
 
 ## Animal Forest Chat Application
 
-## Requirements
+## Prerequisites
 
 * Android 16+
 * Android Studio 3.0+
 * JDK 8
-
-## Building the project
 
 ### Sign Up for a PubNub Account
 
@@ -46,7 +44,7 @@ echo SUB_KEY="\"YOUR-PUBNUB-SUB-KEY-HERE\"" >> gradle.properties
 
 This will also create a `app/gradle.properties` file, which is a good place to store confidential information.
 
-## Building and running the sample app
+## Building and running the app
 
 1. Launch Android Studio. On the welcome screen, choose Open an existing Android Studio project.
 
