@@ -1,8 +1,10 @@
 # PubNub Java Chat
 
+[![Build Status](https://travis-ci.com/pubnub/chat-examples-java.svg?token=33vivoVBsBm3RMEntDqx&branch=master)](https://travis-ci.com/pubnub/chat-examples-java)
+
 This repository contains sample code from the [Chat Resource Center](https://www.pubnub.com/developers/chat-resource-center/).
 
-[![Build Status](https://travis-ci.com/pubnub/chat-examples-java.svg?token=33vivoVBsBm3RMEntDqx&branch=master)](https://travis-ci.com/pubnub/chat-examples-java)
+For more information about this project, or how to create your own chat app using PubNub, please check out our [tutorial](https://www.pubnub.com/developers/chat-resource-center/docs/getting-started/android/).
 
 ## Repository structure
 
@@ -38,8 +40,9 @@ Execute the following commands to add your publish and subscribe keys to your lo
 
 ```bash
 cd app/
-echo PUB_KEY="\"YOUR-PUBNUB-PUB-KEY-HERE\"" >> gradle.properties
-echo SUB_KEY="\"YOUR-PUBNUB-SUB-KEY-HERE\"" >> gradle.properties
+echo PUB_KEY="\"YOUR_PUBNUB_PUB_KEY\"" >> gradle.properties
+echo SUB_KEY="\"YOUR_PUBNUB_SUB_KEY\"" >> gradle.properties
+echo app/gradle.properties >> ../.gitignore
 ```
 
 This will also create a `app/gradle.properties` file, which is a good place to store confidential information.

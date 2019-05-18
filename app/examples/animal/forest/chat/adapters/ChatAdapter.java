@@ -18,6 +18,7 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
+import animal.forest.chat.BuildConfig;
 import animal.forest.chat.R;
 import animal.forest.chat.pubnub.Message;
 import animal.forest.chat.util.AndroidUtils;
@@ -28,10 +29,12 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static animal.forest.chat.util.ChatItem.TYPE_OWN_END;
-import static animal.forest.chat.util.ChatItem.TYPE_OWN_HEADER;
+import static animal.forest.chat.util.ChatItem.TYPE_OWN_HEADER_SERIES;
+import static animal.forest.chat.util.ChatItem.TYPE_OWN_HEADER_FULL;
 import static animal.forest.chat.util.ChatItem.TYPE_OWN_MIDDLE;
 import static animal.forest.chat.util.ChatItem.TYPE_REC_END;
-import static animal.forest.chat.util.ChatItem.TYPE_REC_HEADER;
+import static animal.forest.chat.util.ChatItem.TYPE_REC_HEADER_SERIES;
+import static animal.forest.chat.util.ChatItem.TYPE_REC_HEADER_FULL;
 import static animal.forest.chat.util.ChatItem.TYPE_REC_MIDDLE;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHolder> {
@@ -57,13 +60,15 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
     @Override
     public MessageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         switch (viewType) {
-            case TYPE_OWN_HEADER:
+            case TYPE_OWN_HEADER_FULL:
+            case TYPE_OWN_HEADER_SERIES:
             case TYPE_OWN_MIDDLE:
             case TYPE_OWN_END:
                 View sentMessageView = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.item_message_sent, parent, false);
                 return new MessageViewHolder(sentMessageView, viewType);
-            case TYPE_REC_HEADER:
+            case TYPE_REC_HEADER_FULL:
+            case TYPE_REC_HEADER_SERIES:
             case TYPE_REC_MIDDLE:
             case TYPE_REC_END:
                 View receivedMessageView = LayoutInflater.from(parent.getContext())
@@ -134,7 +139,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
 
         @OnClick(R.id.root)
         void rootClick(View v) {
-            showMessageInfoDialog(v.getContext(), mMessage);
+            if (BuildConfig.DEBUG) {
+                showMessageInfoDialog(v.getContext(), mMessage);
+            }
         }
 
         Message mMessage;
@@ -174,8 +181,14 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
 
         private void handleType() {
             switch (mType) {
-                case TYPE_OWN_HEADER:
-                case TYPE_REC_HEADER:
+                case TYPE_OWN_HEADER_FULL:
+                case TYPE_REC_HEADER_FULL:
+                    mAvatar.setVisibility(View.VISIBLE);
+                    mSender.setVisibility(View.VISIBLE);
+                    mTimestamp.setVisibility(View.VISIBLE);
+                    break;
+                case TYPE_OWN_HEADER_SERIES:
+                case TYPE_REC_HEADER_SERIES:
                     mAvatar.setVisibility(View.VISIBLE);
                     mSender.setVisibility(View.VISIBLE);
                     mTimestamp.setVisibility(View.GONE);
