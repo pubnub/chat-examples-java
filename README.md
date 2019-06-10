@@ -18,9 +18,9 @@ For more information about this project, or how to create your own chat app usin
 
 ## Prerequisites
 
-* Android 16+
 * Android Studio 3.0+
-* JDK 8
+* PubNub SDK
+* A PubNub account
 
 ### Sign Up for a PubNub Account
 
@@ -30,7 +30,7 @@ If you don't already have an account, you can create one for free [here](https:/
 
 1. Select your new app, then click its keyset. Copy the Publish and Subscribe keys. You'll need these keys to include in this project.
 
-1. Scroll down on the Key Options page and enable the following add-on features: [Presence](https://www.pubnub.com/products/presence/), [Storage & Playback](https://www.pubnub.com/products/realtime-messaging/), and [Stream Controller](https://www.pubnub.com/products/realtime-messaging/).
+1. Scroll down on the Key Options page and enable the [Presence](https://www.pubnub.com/products/presence/) and [Storage & Playback](https://www.pubnub.com/products/realtime-messaging/) add-on features.
 
 1. Click Save Changes, and you're done!
 
