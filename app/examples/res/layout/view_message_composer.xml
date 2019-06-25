@@ -13,7 +13,7 @@
         android:layout_toStartOf="@+id/composer_options"
         android:layout_toLeftOf="@+id/composer_options"
         android:background="@null"
-        android:gravity="top|left"
+        android:gravity="top|start"
         android:hint="@string/send_a_message"
         android:importantForAutofill="no"
         android:inputType="textMultiLine"

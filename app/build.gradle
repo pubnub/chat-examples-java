@@ -1,6 +1,8 @@
 apply plugin: 'com.android.application'
 apply plugin: 'checkstyle'
 
+import java.util.Map;
+
 check.dependsOn('checkstyle')
 
 def snippetsPath = "snippets"
@@ -38,6 +40,7 @@ android {
     }
     lintOptions {
         textReport = true
+        disable 'OldTargetApi', 'UnusedAttribute', 'GradleDependency', 'UnusedResources', 'ContentDescription'
     }
     sourceSets {
         main {
@@ -46,7 +49,12 @@ android {
             res.srcDirs = ["$examplesPath/res"]
         }
         test {
-            java.srcDirs = ["$snippetsPath"]
+            java {
+                srcDirs = ["$snippetsPath"]
+                if (System.getenv().get("CI") == null) {
+                    exclude "**/PushNotificationTest*"
+                }
+            }
         }
         androidTest {
             java.srcDirs = ["$integrationTestsPath"]

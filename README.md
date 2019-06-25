@@ -53,6 +53,9 @@ This will also create a `app/gradle.properties` file, which is a good place to s
 
 1. Select the root project folder, `chat-examples-java/`, and click Open.
 
+> **WARNING** If prompted to update the `Android Gradle Plugin` or `Gradle` select `Don't Remind me again for this project`.
+The update introduces a breaking change which will prevent the project from compiling.
+
 1. Wait for Gradle to download dependencies and sync the project. This could take several minutes.
 
 1. Choose Run > Run 'app', and pick the device on which you want to run the app.
