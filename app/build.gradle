@@ -1,6 +1,8 @@
 apply plugin: 'com.android.application'
 apply plugin: 'checkstyle'
 
+import java.util.Map;
+
 check.dependsOn('checkstyle')
 
 def snippetsPath = "snippets"
@@ -38,6 +40,7 @@ android {
     }
     lintOptions {
         textReport = true
+        disable 'OldTargetApi', 'UnusedAttribute', 'GradleDependency', 'UnusedResources', 'ContentDescription'
     }
     sourceSets {
         main {
@@ -46,7 +49,12 @@ android {
             res.srcDirs = ["$examplesPath/res"]
         }
         test {
-            java.srcDirs = ["$snippetsPath"]
+            java {
+                srcDirs = ["$snippetsPath"]
+                if (System.getenv().get("CI") == null) {
+                    exclude "**/PushNotificationTest*"
+                }
+            }
         }
         androidTest {
             java.srcDirs = ["$integrationTestsPath"]
@@ -94,6 +102,8 @@ dependencies {
     // tag::DEP-1[]
     implementation 'com.pubnub:pubnub-gson:4.23.0'
     // end::DEP-1[]
+
+    implementation 'com.google.code.gson:gson:2.8.1'
 
     api 'com.google.guava:guava:27.1-android'
 

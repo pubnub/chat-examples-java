@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -208,7 +209,7 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
             public void presence(PubNub pubnub, PNPresenceEventResult presence) {
                 if (presence.getChannel().equals(mChannel)) {
                     runOnUiThread(() -> hostActivity.setSubtitle(fragmentContext.getResources()
-                            .getString(R.string.members_online, presence.getOccupancy())));
+                            .getQuantityString(R.plurals.members_online, presence.getOccupancy())));
                 }
             }
         };
@@ -224,7 +225,7 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
                     public void onResponse(PNHereNowResult result, PNStatus status) {
                         if (!status.isError()) {
                             hostActivity.setSubtitle(fragmentContext.getResources()
-                                    .getString(R.string.members_online, result.getTotalOccupancy()));
+                                    .getQuantityString(R.plurals.members_online, result.getTotalOccupancy()));
                         }
                     }
                 });
@@ -308,7 +309,7 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
         if (TextUtils.isEmpty(message)) {
             if (BuildConfig.DEBUG) {
                 StringBuilder messageBuilder = new StringBuilder("");
-                messageBuilder.append(UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+                messageBuilder.append(UUID.randomUUID().toString().substring(0, 8).toUpperCase(Locale.US));
                 messageBuilder.append("\n");
                 messageBuilder.append(Helper.parseDateTime(System.currentTimeMillis()));
                 message = messageBuilder.toString();

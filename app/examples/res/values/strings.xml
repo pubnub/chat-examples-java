@@ -11,7 +11,10 @@
     <string name="message_info">Message Info</string>
     <string name="channel_empty">No messages in this channel</string>
     <string name="no_more_messages">No more messages</string>
-    <string name="members_online">%d members online</string>
+    <plurals name="members_online">
+        <item quantity="one">%d member online</item>
+        <item quantity="other">%d members online</item>
+    </plurals>
     <string name="welcome_to">Welcome to</string>
     <string name="animal_forest_chat">Animal Forest Chat</string>
     <string name="ops">Oops…</string>
