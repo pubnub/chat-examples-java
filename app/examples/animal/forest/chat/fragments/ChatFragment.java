@@ -208,8 +208,11 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
             @Override
             public void presence(PubNub pubnub, PNPresenceEventResult presence) {
                 if (presence.getChannel().equals(mChannel)) {
-                    runOnUiThread(() -> hostActivity.setSubtitle(fragmentContext.getResources()
-                            .getQuantityString(R.plurals.members_online, presence.getOccupancy())));
+                    runOnUiThread(() -> {
+                        int members = presence.getOccupancy();
+                        hostActivity.setSubtitle(fragmentContext.getResources()
+                            .getQuantityString(R.plurals.members_online, members, members));
+                    });
                 }
             }
         };
@@ -224,8 +227,9 @@ public class ChatFragment extends ParentFragment implements MessageComposer.List
                     @Override
                     public void onResponse(PNHereNowResult result, PNStatus status) {
                         if (!status.isError()) {
+                            int members = result.getTotalOccupancy();
                             hostActivity.setSubtitle(fragmentContext.getResources()
-                                    .getQuantityString(R.plurals.members_online, result.getTotalOccupancy()));
+                                    .getQuantityString(R.plurals.members_online, members, members));
                         }
                     }
                 });
