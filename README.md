@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.com/pubnub/chat-examples-java.svg?token=33vivoVBsBm3RMEntDqx&branch=master)](https://travis-ci.com/pubnub/chat-examples-java)
 
-This repository contains sample code for the a chat application build using PubNub Android SDK.
+This repository contains sample code for the a chat application built using PubNub Android SDK.
 
 ![Animal Forest Android Chat View](https://www.pubnub.com/docs/chat/img/android/intro_1.png) | ![Animal Forest Android Channel Details](https://www.pubnub.com/docs/chat/img/android/intro_2.png)
 --|---|
