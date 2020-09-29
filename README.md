@@ -23,11 +23,11 @@ This repository contains sample code for a chat application built using the PubN
 
 ### Create a PubNub Account
 
-To run this application you must obtain publish and subscribe keys from your [PubNub Dashboard](https://dashboard.pubnub.com/). If you don't already have an account, you can create one for free.
+To run this application you must obtain publish and subscribe keys from the [Admin Portal](https://dashboard.pubnub.com/). If you don't already have an account, you can create one for free.
 
-1. Sign in to your PubNub Dashboard.
+1. Sign in to the PubNub Admin Portal.
 
-1. Click Create New App. Give your app a name, and select Chat App as the app type. Select a region to store your user data (e.g. Portland). Click Create.
+1. Click Create New App. Give your app a name, and select Chat App as the app type. Select a region to store your user data (for example, Portland). Click Create.
 
 1. Click your new app to open its settings, then click its keyset.
 
@@ -58,4 +58,4 @@ This will also create a `app/gradle.properties` file, which is a good place to s
 
 ## Further Information
 
-For more information about this project, or how to create your own chat app using PubNub, please check out the [PubNub Chat Documentation](https://www.pubnub.com/docs/chat/quickstart).
+For more information about this project, or how to create your own chat app using PubNub, please check out the [PubNub Chat Documentation](https://www.pubnub.com/docs/chat/overview).
